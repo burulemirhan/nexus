@@ -4,9 +4,9 @@
   
   <!-- Homepage - Turkish -->
   <url>
-    <loc>https://nexusbiotech.org/</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en"/>
+    <loc>https://burulemirhan.github.io/Nexus/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -14,9 +14,9 @@
   
   <!-- Homepage - English -->
   <url>
-    <loc>https://nexusbiotech.org/en</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en"/>
+    <loc>https://burulemirhan.github.io/Nexus/en</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -24,9 +24,9 @@
   
   <!-- Engineering Solutions - Turkish -->
   <url>
-    <loc>https://nexusbiotech.org/m%C3%BChendislik-%C3%A7%C3%B6z%C3%BCmleri</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/m%C3%BChendislik-%C3%A7%C3%B6z%C3%BCmleri"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/engineering-solutions"/>
+    <loc>https://burulemirhan.github.io/Nexus/m%C3%BChendislik-%C3%A7%C3%B6z%C3%BCmleri</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/m%C3%BChendislik-%C3%A7%C3%B6z%C3%BCmleri"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/engineering-solutions"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -34,9 +34,9 @@
   
   <!-- Engineering Solutions - English -->
   <url>
-    <loc>https://nexusbiotech.org/en/engineering-solutions</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/m%C3%BChendislik-%C3%A7%C3%B6z%C3%BCmleri"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/engineering-solutions"/>
+    <loc>https://burulemirhan.github.io/Nexus/en/engineering-solutions</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/m%C3%BChendislik-%C3%A7%C3%B6z%C3%BCmleri"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/engineering-solutions"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -44,9 +44,9 @@
   
   <!-- Turnkey Projects - Turkish -->
   <url>
-    <loc>https://nexusbiotech.org/anahtar-teslim-projeler</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/anahtar-teslim-projeler"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/turnkey-projects"/>
+    <loc>https://burulemirhan.github.io/Nexus/anahtar-teslim-projeler</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/anahtar-teslim-projeler"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/turnkey-projects"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -54,9 +54,9 @@
   
   <!-- Turnkey Projects - English -->
   <url>
-    <loc>https://nexusbiotech.org/en/turnkey-projects</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/anahtar-teslim-projeler"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/turnkey-projects"/>
+    <loc>https://burulemirhan.github.io/Nexus/en/turnkey-projects</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/anahtar-teslim-projeler"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/turnkey-projects"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -64,9 +64,9 @@
   
   <!-- Defense Industry Projects - Turkish -->
   <url>
-    <loc>https://nexusbiotech.org/savunma-sanayi-projeleri</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/savunma-sanayi-projeleri"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/defense-industry-projects"/>
+    <loc>https://burulemirhan.github.io/Nexus/savunma-sanayi-projeleri</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/savunma-sanayi-projeleri"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/defense-industry-projects"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -74,9 +74,9 @@
   
   <!-- Defense Industry Projects - English -->
   <url>
-    <loc>https://nexusbiotech.org/en/defense-industry-projects</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/savunma-sanayi-projeleri"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/defense-industry-projects"/>
+    <loc>https://burulemirhan.github.io/Nexus/en/defense-industry-projects</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/savunma-sanayi-projeleri"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/defense-industry-projects"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -84,9 +84,9 @@
   
   <!-- Consulting and Project Management - Turkish -->
   <url>
-    <loc>https://nexusbiotech.org/dan%C4%B1%C5%9Fmanl%C4%B1k-ve-proje-y%C3%B6netimi</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/dan%C4%B1%C5%9Fmanl%C4%B1k-ve-proje-y%C3%B6netimi"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/consulting-and-project-management"/>
+    <loc>https://burulemirhan.github.io/Nexus/dan%C4%B1%C5%9Fmanl%C4%B1k-ve-proje-y%C3%B6netimi</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/dan%C4%B1%C5%9Fmanl%C4%B1k-ve-proje-y%C3%B6netimi"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/consulting-and-project-management"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -94,9 +94,9 @@
   
   <!-- Consulting and Project Management - English -->
   <url>
-    <loc>https://nexusbiotech.org/en/consulting-and-project-management</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nexusbiotech.org/dan%C4%B1%C5%9Fmanl%C4%B1k-ve-proje-y%C3%B6netimi"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://nexusbiotech.org/en/consulting-and-project-management"/>
+    <loc>https://burulemirhan.github.io/Nexus/en/consulting-and-project-management</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burulemirhan.github.io/Nexus/dan%C4%B1%C5%9Fmanl%C4%B1k-ve-proje-y%C3%B6netimi"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burulemirhan.github.io/Nexus/en/consulting-and-project-management"/>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

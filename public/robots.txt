@@ -1,11 +1,11 @@
 # Robots.txt for NEXUS Biotechnologies
-# https://nexusbiotech.org
+# https://burulemirhan.github.io/Nexus/
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://nexusbiotech.org/sitemap.xml
+Sitemap: https://burulemirhan.github.io/Nexus/sitemap.xml
 
 # Disallow admin or private areas (if any)
 Disallow: /api/

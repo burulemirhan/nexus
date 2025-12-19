@@ -43,20 +43,22 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     updateMetaTag('description', description);
     updateMetaTag('og:title', pageTitle);
     updateMetaTag('og:description', description);
-    updateMetaTag('og:image', `https://nexusbiotech.org${image}`);
-    updateMetaTag('og:url', `https://nexusbiotech.org${location.pathname}`);
+    const baseUrl = 'https://burulemirhan.github.io/Nexus';
+
+    updateMetaTag('og:image', `${baseUrl}${image}`);
+    updateMetaTag('og:url', `${baseUrl}${location.pathname}`);
     updateMetaTag('og:locale', language === 'en' ? 'en_US' : 'tr_TR');
     updateMetaTag('twitter:title', pageTitle);
     updateMetaTag('twitter:description', description);
-    updateMetaTag('twitter:image', `https://nexusbiotech.org${image}`);
+    updateMetaTag('twitter:image', `${baseUrl}${image}`);
 
     // Update canonical URL
-    updateLinkTag('canonical', `https://nexusbiotech.org${location.pathname}`);
+    updateLinkTag('canonical', `${baseUrl}${location.pathname}`);
 
     // Update alternate language links
     const trPath = getAlternatePath(location.pathname, 'tr');
     const enPath = getAlternatePath(location.pathname, 'en');
-    updateAlternateLinks(trPath, enPath);
+    updateAlternateLinks(trPath, enPath, baseUrl);
 
   }, [titleKey, descriptionKey, image, t, language, location.pathname]);
 
@@ -100,7 +102,7 @@ function updateLinkTag(rel: string, href: string) {
   }
 }
 
-function updateAlternateLinks(trPath: string, enPath: string) {
+function updateAlternateLinks(trPath: string, enPath: string, baseUrl: string) {
   // Remove existing alternate links
   document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(el => el.remove());
   
@@ -108,21 +110,21 @@ function updateAlternateLinks(trPath: string, enPath: string) {
   const trLink = document.createElement('link');
   trLink.rel = 'alternate';
   trLink.hreflang = 'tr';
-  trLink.href = `https://nexusbiotech.org${trPath}`;
+  trLink.href = `${baseUrl}${trPath}`;
   document.head.appendChild(trLink);
   
   // Add English alternate
   const enLink = document.createElement('link');
   enLink.rel = 'alternate';
   enLink.hreflang = 'en';
-  enLink.href = `https://nexusbiotech.org${enPath}`;
+  enLink.href = `${baseUrl}${enPath}`;
   document.head.appendChild(enLink);
   
   // Add x-default (defaults to Turkish)
   const defaultLink = document.createElement('link');
   defaultLink.rel = 'alternate';
   defaultLink.hreflang = 'x-default';
-  defaultLink.href = `https://nexusbiotech.org${trPath}`;
+  defaultLink.href = `${baseUrl}${trPath}`;
   document.head.appendChild(defaultLink);
 }
 

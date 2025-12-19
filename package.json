@@ -1,7 +1,6 @@
 {
   "name": "nexus---advanced-agricultural-engineering",
   "private": true,
-  "homepage": "https://burulemirhan.github.io/Nexus/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
