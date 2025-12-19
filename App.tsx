@@ -82,7 +82,6 @@ const App: React.FC = () => {
             preload="auto"
             className="w-full h-full object-cover -z-50"
             aria-hidden="true"
-            playsInline
           >
             <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
              {/* Fallback stock video of vertical farming/technology */}
