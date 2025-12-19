@@ -15,10 +15,10 @@ const DefenseProjects: React.FC = () => {
 
   // Map each feature to its image
   const featureImagesMap: Record<string, string> = {
-    'service3.feature1': '/assets/images/defense1.png',
-    'service3.feature2': '/assets/images/defense2.png',
-    'service3.feature3': '/assets/images/defense3.png',
-    'service3.feature4': '/assets/images/defense4.png',
+    'service3.feature1': '/assets/images/defense1.avif',
+    'service3.feature2': '/assets/images/defense2.avif',
+    'service3.feature3': '/assets/images/defense3.avif',
+    'service3.feature4': '/assets/images/defense4.avif',
   };
 
   return (
@@ -29,7 +29,7 @@ const DefenseProjects: React.FC = () => {
       featuresKey={featuresKey}
       processKey={processKey}
       customBackground="white"
-      heroBackgroundImage="/assets/images/bg4.png"
+      heroBackgroundImage="/assets/images/bg4.avif"
       centerFeatures={true}
       hideCTATitle={true}
       featureImagesMap={featureImagesMap}

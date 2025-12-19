@@ -21,8 +21,8 @@ const EngineeringSolutions: React.FC = () => {
       featuresKey={featuresKey}
       processKey={processKey}
       customBackground="white"
-      heroBackgroundImage="/assets/images/bg2.png"
-      featureImages={['/assets/images/vfd.png', '/assets/images/ghd.png', '/assets/images/fieldd.png']}
+      heroBackgroundImage="/assets/images/bg2.avif"
+      featureImages={['/assets/images/vfd.avif', '/assets/images/ghd.avif', '/assets/images/fieldd.avif']}
     />
   );
 };
