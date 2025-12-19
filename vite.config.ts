@@ -5,9 +5,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     
-    // For GitHub Pages: deploying to /nexus subdirectory
-    // You can override this with environment variable: VITE_BASE_PATH=/your-repo-name/
-    const base = process.env.VITE_BASE_PATH || '/nexus/';
+    // For custom domain (nexusbiotech.org) - using root path
+    // You can override this with environment variable: VITE_BASE_PATH=/your-path/
+    const base = process.env.VITE_BASE_PATH || '/';
     
     return {
       base: base,
