@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
-import LoadingScreen from '../components/LoadingScreen';
+import AssetPreloader from '../components/AssetPreloader';
 import { useLanguage } from '../contexts/LanguageContext';
 import Lenis from 'lenis';
 
@@ -41,9 +41,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const lenisRef = useRef<Lenis | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Helper function to prepend BASE_URL to paths starting with /
   const getAssetPath = (path: string | undefined): string | undefined => {
@@ -53,52 +51,14 @@ const ServicePage: React.FC<ServicePageProps> = ({
     return `${BASE_URL}${path}`;
   };
 
-  // Preload critical assets (hero background image and video if needed)
-  useEffect(() => {
-    const assetsToLoad: Promise<void>[] = [];
-    
-    // Preload hero background image if present
-    if (heroBackgroundImage) {
-      const imgPath = getAssetPath(heroBackgroundImage);
-      if (imgPath) {
-        const imgPromise = new Promise<void>((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve();
-          img.onerror = () => resolve(); // Still resolve if image fails
-          img.src = imgPath;
-        });
-        assetsToLoad.push(imgPromise);
-      }
-    }
-    
-    // Preload background video if not white background
-    if (customBackground !== 'white') {
-      const videoSrc = `${BASE_URL}assets/videos/bg.mp4`;
-      const videoPromise = new Promise<void>((resolve) => {
-        const video = document.createElement('video');
-        video.preload = 'auto';
-        video.src = videoSrc;
-        video.oncanplaythrough = () => resolve();
-        video.onerror = () => resolve(); // Still resolve if video fails
-        video.load();
-      });
-      assetsToLoad.push(videoPromise);
-    }
-    
-    // Wait for all assets to load, with timeout fallback
-    Promise.all(assetsToLoad).then(() => {
-      setIsLoading(false);
-    });
-    
-    // Timeout fallback - show page after 8 seconds even if assets haven't loaded
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 8000);
-    
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [heroBackgroundImage, customBackground]);
+  // Collect critical assets to preload (hero background image)
+  const criticalAssets = heroBackgroundImage 
+    ? [getAssetPath(heroBackgroundImage) || ''].filter(Boolean)
+    : [];
+
+  const handleAssetsLoaded = () => {
+    // Assets loaded, page will be shown by AssetPreloader
+  };
 
   // Prevent browser scroll restoration
   useEffect(() => {
@@ -227,17 +187,14 @@ const ServicePage: React.FC<ServicePageProps> = ({
   const textColorClass = isWhiteBackground ? 'text-black' : 'text-white';
   const selectionClass = isWhiteBackground ? 'selection:bg-nexus-copper selection:text-black' : 'selection:bg-nexus-copper selection:text-white';
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
   return (
-    <div className={`min-h-screen flex flex-col relative overflow-x-hidden ${selectionClass} font-tech ${textColorClass}`}>
-      <SEOHead 
-        titleKey={titleKey} 
-        descriptionKey={subtitleKey}
-        image={heroBackgroundImage}
-      />
+    <AssetPreloader assets={criticalAssets} onLoadComplete={handleAssetsLoaded}>
+      <div className={`min-h-screen flex flex-col relative overflow-x-hidden ${selectionClass} font-tech ${textColorClass}`}>
+        <SEOHead 
+          titleKey={titleKey} 
+          descriptionKey={subtitleKey}
+          image={heroBackgroundImage}
+        />
       
       {/* Global Background */}
       {isWhiteBackground ? (
@@ -246,12 +203,10 @@ const ServicePage: React.FC<ServicePageProps> = ({
         <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark">
           <div className="absolute inset-0 w-full h-full">
             <video 
-              ref={videoRef}
               autoPlay 
               loop 
               muted 
               playsInline
-              preload="auto"
               className="w-full h-full object-cover -z-50"
               poster={`${BASE_URL}assets/images/bg.png`}
             >
@@ -483,7 +438,8 @@ const ServicePage: React.FC<ServicePageProps> = ({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AssetPreloader>
   );
 };
 

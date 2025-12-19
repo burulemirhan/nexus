@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -9,56 +9,30 @@ import DefenseSpace from './components/DefenseSpace';
 import Services from './components/Services';
 import Footer from './components/Footer';
 import SEOHead from './components/SEOHead';
-import LoadingScreen from './components/LoadingScreen';
+import AssetPreloader from './components/AssetPreloader';
 import Lenis from 'lenis';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
 
+// Critical assets to preload for main page
+const CRITICAL_ASSETS = [
+  `${BASE_URL}assets/videos/bg.mp4`,
+  `${BASE_URL}assets/images/bg.png`, // Fallback poster
+];
+
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const location = useLocation();
-
-  // Preload critical video asset
-  useEffect(() => {
-    const videoSrc = `${BASE_URL}assets/videos/bg.mp4`;
-    const video = document.createElement('video');
-    video.preload = 'auto';
-    video.src = videoSrc;
-    
-    const handleCanPlay = () => {
-      setIsLoading(false);
-    };
-    
-    const handleError = () => {
-      // If video fails, still show the page (fallback will work)
-      setIsLoading(false);
-    };
-    
-    video.addEventListener('canplaythrough', handleCanPlay);
-    video.addEventListener('error', handleError);
-    
-    // Start loading
-    video.load();
-    
-    // Timeout fallback - show page after 5 seconds even if video hasn't loaded
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
-    
-    return () => {
-      video.removeEventListener('canplaythrough', handleCanPlay);
-      video.removeEventListener('error', handleError);
-      clearTimeout(timeout);
-    };
-  }, []);
 
   // Update HTML lang attribute based on route
   useEffect(() => {
     const htmlLang = location.pathname.startsWith('/en') ? 'en' : 'tr';
     document.documentElement.lang = htmlLang;
   }, [location.pathname]);
+
+  const handleAssetsLoaded = () => {
+    // Assets loaded, page will be shown by AssetPreloader
+  };
 
   useEffect(() => {
     // Initialize Lenis for smooth scrolling
@@ -102,19 +76,15 @@ const App: React.FC = () => {
     };
   }, []);
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-nexus-copper selection:text-white font-tech text-white">
-      <SEOHead />
+    <AssetPreloader assets={CRITICAL_ASSETS} onLoadComplete={handleAssetsLoaded}>
+      <div className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-nexus-copper selection:text-white font-tech text-white">
+        <SEOHead />
       
       {/* Global Background Video (Vertical Farming Theme) */}
       <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" aria-hidden="true">
         <div className="absolute inset-0 w-full h-full">
           <video 
-            ref={videoRef}
             autoPlay 
             loop 
             muted 
@@ -154,7 +124,8 @@ const App: React.FC = () => {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </AssetPreloader>
   );
 };
 
