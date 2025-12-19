@@ -64,6 +64,11 @@ const ServicePage: React.FC<ServicePageProps> = ({
     }
   }, []);
 
+  // Reset preloader when route changes
+  useEffect(() => {
+    setShowPreloader(true);
+  }, [location.pathname]);
+
   // Set scroll position synchronously before browser paints
   useLayoutEffect(() => {
     // Set scroll position immediately without any animation or delay
@@ -87,11 +92,6 @@ const ServicePage: React.FC<ServicePageProps> = ({
     setTimeout(() => {
       document.documentElement.style.scrollBehavior = originalScrollBehavior;
     }, 0);
-  }, [location.pathname]);
-
-  // Reset preloader when route changes
-  useEffect(() => {
-    setShowPreloader(true);
   }, [location.pathname]);
 
   // Reset Lenis scroll position when pathname changes (double check)
@@ -191,12 +191,6 @@ const ServicePage: React.FC<ServicePageProps> = ({
 
   return (
     <div className={`min-h-screen flex flex-col relative overflow-x-hidden ${selectionClass} font-tech ${textColorClass}`}>
-      {showPreloader && (
-        <Preloader 
-          onDone={() => setShowPreloader(false)}
-          minDuration={2000}
-        />
-      )}
       <SEOHead 
         titleKey={titleKey} 
         descriptionKey={subtitleKey}
@@ -271,6 +265,13 @@ const ServicePage: React.FC<ServicePageProps> = ({
             }} 
           />
         </div>
+      )}
+      
+      {showPreloader && (
+        <Preloader 
+          onDone={() => setShowPreloader(false)}
+          minDuration={2000}
+        />
       )}
       
       <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} darkMode={isWhiteBackground} />
