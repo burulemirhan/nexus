@@ -18,6 +18,18 @@ interface Branch {
   progress: number;
   dotProgress: number;
   endDotSize: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  nodes: Array<{ x: number; y: number; size: number }>; // Intersection nodes along this branch
+}
+
+interface Node {
+  x: number;
+  y: number;
+  size: number;
+  connections: number; // Number of branches connecting here
 }
 
 const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => {
@@ -64,15 +76,16 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
     };
   };
 
-  // Generate deterministic branches
-  const generateBranches = (count: number, seed: number): Branch[] => {
+  // Generate complex network of branches in all directions
+  const generateBranches = (count: number, seed: number, centerX: number, centerY: number): Branch[] => {
     const random = seededRandom(seed);
     const branches: Branch[] = [];
     
+    // Primary branches in many directions
     for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2 + (random() - 0.5) * 0.3;
-      const maxLength = 150 + random() * 100; // 150-250px (longer arms)
-      const curve = (random() - 0.5) * 0.4; // -0.2 to 0.2 curvature
+      const angle = (i / count) * Math.PI * 2 + (random() - 0.5) * 0.5;
+      const maxLength = 120 + random() * 140; // 120-260px - varied lengths
+      const curve = (random() - 0.5) * 0.6; // More curvature variation
       
       branches.push({
         angle,
@@ -82,10 +95,70 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         progress: 0,
         dotProgress: 0,
         endDotSize: 0,
+        startX: centerX,
+        startY: centerY,
+        endX: centerX,
+        endY: centerY,
+        nodes: [],
       });
     }
     
     return branches;
+  };
+
+  // Find intersection points between branches (simplified line-line intersection)
+  const findIntersections = (branches: Branch[]): Node[] => {
+    const nodes: Map<string, Node> = new Map();
+    const threshold = 8; // Distance threshold for considering two points as a node
+    
+    for (let i = 0; i < branches.length; i++) {
+      const branch1 = branches[i];
+      if (branch1.progress <= 0) continue;
+      
+      for (let j = i + 1; j < branches.length; j++) {
+        const branch2 = branches[j];
+        if (branch2.progress <= 0) continue;
+        
+        // Check if branches are close enough (simplified - check end points and mid points)
+        const dist1 = Math.hypot(branch1.endX - branch2.endX, branch1.endY - branch2.endY);
+        const dist2 = Math.hypot(branch1.endX - branch2.startX, branch1.endY - branch2.startY);
+        const dist3 = Math.hypot(branch1.startX - branch2.endX, branch1.startY - branch2.endY);
+        
+        let intersectionX = 0;
+        let intersectionY = 0;
+        let found = false;
+        
+        if (dist1 < threshold) {
+          intersectionX = (branch1.endX + branch2.endX) / 2;
+          intersectionY = (branch1.endY + branch2.endY) / 2;
+          found = true;
+        } else if (dist2 < threshold && branch2.progress > 0.5) {
+          intersectionX = (branch1.endX + branch2.startX) / 2;
+          intersectionY = (branch1.endY + branch2.startY) / 2;
+          found = true;
+        } else if (dist3 < threshold && branch1.progress > 0.5) {
+          intersectionX = (branch1.startX + branch2.endX) / 2;
+          intersectionY = (branch1.startY + branch2.endY) / 2;
+          found = true;
+        }
+        
+        if (found) {
+          const key = `${Math.round(intersectionX / 5) * 5},${Math.round(intersectionY / 5) * 5}`;
+          if (nodes.has(key)) {
+            nodes.get(key)!.connections++;
+          } else {
+            nodes.set(key, {
+              x: intersectionX,
+              y: intersectionY,
+              size: 2,
+              connections: 2,
+            });
+          }
+        }
+      }
+    }
+    
+    return Array.from(nodes.values());
   };
 
   useEffect(() => {
@@ -172,11 +245,11 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
       };
     }
 
-    // Full animation
-    const branchCount = 18; // More arms for richer network
-    let branches = generateBranches(branchCount, 42); // Seed: 42
-    const cycleDuration = 3000; // 3 seconds per cycle (growth + fade)
-    const growthPhase = 0.5; // First 50% is growth, rest is fade
+    // Full animation - slower and more complex
+    const branchCount = 28; // Many more branches for complex network
+    let branches = generateBranches(branchCount, 42, width / 2, height / 2); // Seed: 42
+    const cycleDuration = 5000; // 5 seconds per cycle (slower animation)
+    const growthPhase = 0.6; // First 60% is growth, rest is fade (slower fade)
 
     const animate = () => {
       const elapsed = Date.now() - cycleStartTimeRef.current;
@@ -205,15 +278,33 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
       if (isGrowing) {
         const easedProgress = easeOutCubic(phaseProgress);
         
-        // Update branches
+        // Update branches and calculate positions
         branches.forEach((branch) => {
           branch.progress = easedProgress;
           branch.length = branch.maxLength * easedProgress;
           
-          // Dot appears when branch is 70% grown
-          if (easedProgress > 0.7) {
-            branch.dotProgress = Math.min(1, (easedProgress - 0.7) / 0.3);
-            branch.endDotSize = 3 * easeOutCubic(branch.dotProgress);
+          // Calculate current end position
+          const endX = centerX + Math.cos(branch.angle) * branch.length;
+          const endY = centerY + Math.sin(branch.angle) * branch.length;
+          
+          // Apply curvature
+          const midX = (centerX + endX) / 2;
+          const midY = (centerY + endY) / 2;
+          const perpAngle = branch.angle + Math.PI / 2;
+          const curveOffset = branch.curve * branch.length * 0.3;
+          const curveX = midX + Math.cos(perpAngle) * curveOffset;
+          const curveY = midY + Math.sin(perpAngle) * curveOffset;
+          
+          // Recalculate end position with curve (simplified)
+          branch.endX = curveX + (endX - curveX) * 0.8;
+          branch.endY = curveY + (endY - curveY) * 0.8;
+          branch.startX = centerX;
+          branch.startY = centerY;
+          
+          // Dot appears when branch is 65% grown
+          if (easedProgress > 0.65) {
+            branch.dotProgress = Math.min(1, (easedProgress - 0.65) / 0.35);
+            branch.endDotSize = 2.5 * easeOutCubic(branch.dotProgress);
           }
         });
       } else {
@@ -231,18 +322,18 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         if (branch.progress <= 0) return;
 
         const opacity = isGrowing 
-          ? Math.min(1, branch.progress * 1.5)
+          ? Math.min(1, branch.progress * 1.4)
           : branch.progress;
 
         if (opacity <= 0) return;
 
-        // Calculate branch path with curve
-        const startX = centerX;
-        const startY = centerY;
-        const endX = startX + Math.cos(branch.angle) * branch.length;
-        const endY = startY + Math.sin(branch.angle) * branch.length;
+        // Use calculated positions from branch update
+        const startX = branch.startX;
+        const startY = branch.startY;
+        const endX = branch.endX;
+        const endY = branch.endY;
 
-        // Apply curvature
+        // Calculate curve control point
         const midX = (startX + endX) / 2;
         const midY = (startY + endY) / 2;
         const perpAngle = branch.angle + Math.PI / 2;
@@ -297,6 +388,41 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         }
       });
 
+      // Draw intersection nodes (where branches connect)
+      nodes.forEach((node) => {
+        const avgProgress = branches.length > 0 
+          ? branches.reduce((sum, b) => sum + b.progress, 0) / branches.length 
+          : 0;
+        const nodeOpacity = isGrowing ? 1 : Math.max(0.3, avgProgress);
+        if (nodeOpacity <= 0) return;
+        
+        ctx.save();
+        ctx.globalAlpha = nodeOpacity * 0.8;
+        
+        // Node halo
+        const nodeGradient = ctx.createRadialGradient(
+          node.x, node.y, 0,
+          node.x, node.y, node.size * 3
+        );
+        nodeGradient.addColorStop(0, `rgba(255, 255, 255, ${nodeOpacity * 0.5})`);
+        nodeGradient.addColorStop(0.7, `rgba(255, 255, 255, ${nodeOpacity * 0.2})`);
+        nodeGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.fillStyle = nodeGradient;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.size * 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Node core - size based on connections
+        const nodeCoreSize = node.size + (node.connections - 2) * 0.5;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, nodeCoreSize, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      });
+
       // Draw central dot (always visible during growth, fades during fade phase)
       const centralDotOpacity = isGrowing ? 1 : Math.max(0.3, 1 - easeInOutCubic(phaseProgress));
       if (centralDotOpacity > 0) {
@@ -329,7 +455,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
       // Reset cycle if we've faded completely - ensure continuous looping
       if (!isGrowing && phaseProgress >= 1) {
         cycleStartTimeRef.current = Date.now();
-        branches = generateBranches(branchCount, 42);
+        branches = generateBranches(branchCount, 42, centerX, centerY);
       }
 
       // Always continue animation loop - never stop until component unmounts
