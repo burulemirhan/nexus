@@ -36,14 +36,16 @@ img, video {
   display: block;
 }
 
-/* Reduce layout shift for images */
+/* Reduce layout shift for images and optimize rendering */
 img {
   content-visibility: auto;
+  transform: translateZ(0);
+  will-change: auto;
 }
 
-/* Smooth scroll behavior */
+/* Smooth scroll behavior - disabled when using Lenis */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* Lenis handles smooth scrolling */
 }
 
 /* Focus styles for accessibility */
@@ -92,7 +94,7 @@ html {
   background: #555;
 }
 
-/* Lenis smooth scrolling */
+/* Lenis smooth scrolling - performance optimized */
 html.lenis, html.lenis body {
   height: auto;
 }
@@ -111,6 +113,80 @@ html.lenis, html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Performance optimizations for smooth scrolling */
+section {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+/* GPU acceleration for fixed elements and scrolling */
+nav {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: opacity, transform;
+}
+
+/* Optimize video rendering - avoid will-change during scroll */
+video {
+  transform: translateZ(0);
+  contain: strict;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optimize fixed backgrounds */
+.fixed {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Reduce repaints during scroll */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize transitions - only on non-scrolling properties */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Optimize opacity transitions */
+.transition-opacity,
+[class*="transition"] {
+  will-change: auto;
+}
+
+/* Only apply will-change when actually transitioning */
+.transition-opacity:hover,
+.transition-opacity:focus {
+  will-change: opacity;
+}
+
+/* Optimize scrolling performance - use transform instead of position changes */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent layout thrashing */
+body {
+  transform: translateZ(0);
+}
+
+/* Optimize section rendering */
+section {
+  isolation: isolate;
+}
+
+/* Reduce paint complexity */
+main {
+  contain: layout style;
 }
 
 /* Hide scrollbar utility */

@@ -66,7 +66,7 @@ const DefenseSpace: React.FC = () => {
   );
 
   return (
-    <section id="defense" className="min-h-screen flex items-center py-16 md:py-24 relative bg-black overflow-hidden">
+    <section id="defense" className="min-h-screen flex items-center py-16 md:py-24 relative bg-black overflow-hidden" style={{ willChange: 'scroll-position', contentVisibility: 'auto' }}>
 
       <div className="w-full px-4 md:px-12 relative z-10 flex flex-col justify-center min-h-full">
         
@@ -82,7 +82,7 @@ const DefenseSpace: React.FC = () => {
         <div className="flex flex-col gap-8 md:gap-10 w-full max-w-[90rem] mx-auto">
             
             {/* Savunma - Defense Card (Bio-Secure Iris Concept) */}
-            <div className="group relative overflow-hidden flex flex-col min-h-[270px] md:min-h-[300px] bg-black/40" style={{ willChange: 'auto' }}>
+            <div className="group relative overflow-hidden flex flex-col min-h-[270px] md:min-h-[300px] bg-black/40" style={{ transform: 'translateZ(0)' }}>
                 
                 {/* Optimized Background Grid Pattern - Static to reduce repaints */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:22px_22px] opacity-15 pointer-events-none" style={{ transform: 'translateZ(0)' }} />
@@ -154,7 +154,7 @@ const DefenseSpace: React.FC = () => {
             </div>
 
             {/* Uzay - Space area with Video Background */}
-            <div className="group relative overflow-hidden flex flex-col min-h-[500px] md:min-h-[720px]" style={{ willChange: 'auto' }}>
+            <div className="group relative overflow-hidden flex flex-col min-h-[500px] md:min-h-[720px]" style={{ transform: 'translateZ(0)' }}>
                  {/* Background video fills box */}
                  <video
                    ref={(video) => {
@@ -168,6 +168,10 @@ const DefenseSpace: React.FC = () => {
                        video.removeAttribute('controls');
                        video.style.pointerEvents = 'none';
                        video.style.outline = 'none';
+                       // Performance optimizations
+                       video.style.transform = 'translateZ(0)';
+                       video.style.willChange = 'auto';
+                       video.style.contain = 'strict';
                        
                        // Ensure video plays and stays playing
                        const ensurePlaying = () => {

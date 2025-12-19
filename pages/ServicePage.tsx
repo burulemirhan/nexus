@@ -127,13 +127,14 @@ const ServicePage: React.FC<ServicePageProps> = ({
     });
 
     const lenis = new Lenis({
-      duration: 1.0,
+      duration: 1.2, // Slightly longer for smoother feel
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 2,
+      wheelMultiplier: 0.8, // Slightly reduced for better control
+      touchMultiplier: 1.5, // Reduced for better mobile performance
+      infinite: false,
     });
 
     lenisRef.current = lenis;
@@ -201,7 +202,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
       {isWhiteBackground ? (
         <div className="fixed inset-0 z-0 select-none overflow-hidden bg-white" />
       ) : (
-        <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark">
+        <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
           <div className="absolute inset-0 w-full h-full">
             <video 
               ref={(video) => {
@@ -215,6 +216,10 @@ const ServicePage: React.FC<ServicePageProps> = ({
                   video.removeAttribute('controls');
                   video.style.pointerEvents = 'none';
                   video.style.outline = 'none';
+                  // Performance optimizations
+                  video.style.transform = 'translateZ(0)';
+                  video.style.willChange = 'auto';
+                  video.style.contain = 'strict';
                   
                   // Ensure video plays and stays playing
                   const ensurePlaying = () => {

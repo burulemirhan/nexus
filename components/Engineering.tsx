@@ -5,7 +5,7 @@ const Engineering: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section id="engineering" className="min-h-screen flex items-center py-24 bg-nexus-dark relative border-t border-white/5 overflow-hidden">
+    <section id="engineering" className="min-h-screen flex items-center py-24 bg-nexus-dark relative border-t border-white/5 overflow-hidden" style={{ willChange: 'scroll-position', contentVisibility: 'auto' }}>
        {/* Background noise/gradient matches other sections */}
        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/80 pointer-events-none" />
        

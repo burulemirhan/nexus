@@ -9,6 +9,7 @@ const Hero: React.FC = () => {
     <section 
       className="relative min-h-screen flex items-center overflow-hidden"
       aria-labelledby="hero-title"
+      style={{ willChange: 'scroll-position', contentVisibility: 'auto' }}
     >
       
       <div className="absolute bottom-16 md:bottom-24 left-4 md:left-12 z-20 flex flex-col items-start gap-4 md:gap-6 pr-4 md:pr-0 max-w-[calc(100vw-2rem)] md:max-w-none">

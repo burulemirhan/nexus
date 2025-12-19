@@ -27,15 +27,16 @@ const App: React.FC = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    // Initialize Lenis for smooth scrolling
+    // Initialize Lenis for smooth scrolling with optimized settings
     const lenis = new Lenis({
-      duration: 1.0,
+      duration: 1.2, // Slightly longer for smoother feel
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 2,
+      wheelMultiplier: 0.8, // Slightly reduced for better control
+      touchMultiplier: 1.5, // Reduced for better mobile performance
+      infinite: false,
     });
 
     function raf(time: number) {
@@ -79,7 +80,7 @@ const App: React.FC = () => {
       <SEOHead />
       
       {/* Global Background Video (Vertical Farming Theme) */}
-      <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" aria-hidden="true">
+      <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" aria-hidden="true" style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
         <div className="absolute inset-0 w-full h-full">
           <video 
             ref={(video) => {
@@ -92,9 +93,11 @@ const App: React.FC = () => {
                 video.setAttribute('playsinline', 'true');
                 video.removeAttribute('controls');
                 video.style.pointerEvents = 'none';
-                
-                // Hide controls via CSS
                 video.style.outline = 'none';
+                // Performance optimizations
+                video.style.transform = 'translateZ(0)';
+                video.style.willChange = 'auto';
+                video.style.contain = 'strict';
                 
                 // Ensure video plays and stays playing
                 const ensurePlaying = () => {
