@@ -7,6 +7,7 @@ import EngineeringSolutions from './pages/EngineeringSolutions';
 import TurnkeyProjects from './pages/TurnkeyProjects';
 import DefenseProjects from './pages/DefenseProjects';
 import ConsultingProjectManagement from './pages/ConsultingProjectManagement';
+import ScrollToTop from './components/ScrollToTop';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -21,6 +22,7 @@ const basePath = import.meta.env.BASE_URL || '/';
 root.render(
   <React.StrictMode>
     <BrowserRouter basename={basePath}>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={
           <LanguageProvider defaultLanguage="tr">

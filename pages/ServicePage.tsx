@@ -54,6 +54,11 @@ const ServicePage: React.FC<ServicePageProps> = ({
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
+    // Also reset Lenis if it exists
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+    
     // Disable smooth scrolling temporarily
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
@@ -67,11 +72,17 @@ const ServicePage: React.FC<ServicePageProps> = ({
     }, 0);
   }, [location.pathname]);
 
-  // Reset Lenis scroll position when pathname changes
+  // Reset Lenis scroll position when pathname changes (double check)
   useEffect(() => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true });
-    }
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(0, { immediate: true });
+      }
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
   }, [location.pathname]);
 
   useEffect(() => {
@@ -80,10 +91,18 @@ const ServicePage: React.FC<ServicePageProps> = ({
   }, [location.pathname]);
 
   useEffect(() => {
-    // Ensure we start at top before initializing Lenis
+    // Ensure we start at top BEFORE initializing Lenis
+    // Do this multiple times to ensure it sticks
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+    
+    // Force scroll reset again after a microtask
+    Promise.resolve().then(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
 
     const lenis = new Lenis({
       duration: 1.0,
@@ -98,7 +117,20 @@ const ServicePage: React.FC<ServicePageProps> = ({
     lenisRef.current = lenis;
 
     // Set scroll position to 0 immediately when Lenis initializes
+    // Multiple attempts to ensure it works
     lenis.scrollTo(0, { immediate: true });
+    setTimeout(() => {
+      lenis.scrollTo(0, { immediate: true });
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 0);
+    
+    // One more attempt after Lenis has had time to initialize
+    setTimeout(() => {
+      lenis.scrollTo(0, { immediate: true });
+      window.scrollTo(0, 0);
+    }, 100);
 
     function raf(time: number) {
       lenis.raf(time);
