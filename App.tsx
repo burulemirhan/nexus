@@ -87,27 +87,27 @@ const App: React.FC = () => {
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 bg-nexus-dark flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center gap-8">
+        <div className="flex flex-col items-center justify-center gap-12">
           <div className="relative">
-            {/* Animated loading circle */}
-            <div className="w-24 h-24 md:w-32 md:h-32 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin-fast"></div>
-            {/* Inner circle */}
+            {/* Animated loading circle - 50% bigger */}
+            <div className="w-36 h-36 md:w-48 md:h-48 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin-fast"></div>
+            {/* Inner circle - 50% bigger */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 border-4 border-emerald-500/20 border-b-emerald-500 rounded-full animate-spin-fast-reverse"></div>
+              <div className="w-24 h-24 md:w-30 md:h-30 border-4 border-emerald-500/20 border-b-emerald-500 rounded-full animate-spin-fast-reverse"></div>
             </div>
           </div>
-          <div className="text-white text-3xl md:text-5xl font-tesla tracking-widest animate-pulse" style={{ fontFamily: 'Barlow' }}>
+          <div className="text-white text-4xl md:text-6xl font-tesla tracking-widest animate-pulse" style={{ fontFamily: 'Barlow' }}>
             NEXUS
           </div>
         </div>
         <style>{`
           @keyframes spin-fast {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
           @keyframes spin-fast-reverse {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
           }
           .animate-spin-fast {
             animation: spin-fast 0.8s linear infinite;
