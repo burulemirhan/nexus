@@ -84,13 +84,22 @@ const App: React.FC = () => {
           <video 
             ref={(video) => {
               if (video) {
+                // Force remove all controls and attributes that might show buttons
                 video.muted = true;
                 video.loop = true;
                 video.playsInline = true;
                 video.setAttribute('webkit-playsinline', 'true');
                 video.setAttribute('playsinline', 'true');
                 video.removeAttribute('controls');
+                video.controls = false;
+                video.setAttribute('controls', 'false');
                 video.style.pointerEvents = 'none';
+                video.style.webkitTapHighlightColor = 'transparent';
+                // Hide any native controls that might appear
+                video.addEventListener('loadedmetadata', () => {
+                  video.controls = false;
+                  video.removeAttribute('controls');
+                });
                 // Ensure video plays on mobile
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
@@ -112,6 +121,9 @@ const App: React.FC = () => {
             muted 
             playsInline
             preload="auto"
+            controls={false}
+            controlsList="nodownload nofullscreen noremoteplayback"
+            disablePictureInPicture
             className="w-full h-full object-cover -z-50"
             aria-hidden="true"
             style={{ pointerEvents: 'none' }}
