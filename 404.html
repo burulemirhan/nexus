@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXUS | Page Not Found</title>
+    <script>
+      // GitHub Pages SPA routing fix
+      // Redirect to index.html for client-side routing
+      const path = window.location.pathname;
+      const search = window.location.search;
+      const hash = window.location.hash;
+      
+      // If not already at index.html, redirect
+      if (!path.endsWith('/index.html') && path !== '/') {
+        const basePath = window.location.pathname.split('/').slice(0, -1).join('/') || '';
+        window.location.replace(basePath + '/index.html' + search + hash);
+      } else {
+        // If already at index.html, redirect to root
+        window.location.replace('/' + search + hash);
+      }
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>
+
