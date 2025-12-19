@@ -123,6 +123,46 @@ html.lenis, html.lenis body {
   display: none;
 }
 
+/* Hide video controls completely - especially for mobile */
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+}
+
+video {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Hide video controls overlay on iOS */
+video[controls] {
+  display: none;
+}
+
+video:not([controls]) {
+  display: block;
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -134,82 +174,6 @@ html.lenis, html.lenis body {
   html {
     scroll-behavior: auto;
   }
-}
-
-/* Hide video controls and play buttons - especially on mobile */
-video {
-  /* Remove all native controls */
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-video::-webkit-media-controls {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-video::-webkit-media-controls-enclosure {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-video::-webkit-media-controls-panel {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-video::-webkit-media-controls-play-button {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-}
-
-video::-webkit-media-controls-start-playback-button {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-}
-
-video::-webkit-media-controls-overlay-play-button {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-}
-
-video::-webkit-media-controls-current-time-display,
-video::-webkit-media-controls-time-remaining-display,
-video::-webkit-media-controls-timeline,
-video::-webkit-media-controls-volume-slider,
-video::-webkit-media-controls-mute-button,
-video::-webkit-media-controls-fullscreen-button {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* iOS Safari specific - hide play button overlay */
-video[controls],
-video[controls]::-webkit-media-controls-overlay-enclosure {
-  display: none !important;
-  opacity: 0 !important;
-}
-
-/* Ensure video doesn't show any controls */
-video:not([controls]) {
-  /* Force no controls */
-}
-
-video[controlslist="nodownload nofullscreen noremoteplayback"] {
-  /* Additional control hiding */
 }
 
 /* Print styles */

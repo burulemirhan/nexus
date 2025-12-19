@@ -220,6 +220,37 @@
       .hero-gradient {
         background: linear-gradient(180deg, transparent 0%, rgba(2, 5, 3, 0.8) 100%);
       }
+      
+      /* Hide video controls completely - especially for mobile */
+      video::-webkit-media-controls {
+        display: none !important;
+      }
+      
+      video::-webkit-media-controls-enclosure {
+        display: none !important;
+      }
+      
+      video::-webkit-media-controls-panel {
+        display: none !important;
+      }
+      
+      video::-webkit-media-controls-play-button {
+        display: none !important;
+      }
+      
+      video::-webkit-media-controls-start-playback-button {
+        display: none !important;
+      }
+      
+      video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+      }
+      
+      video {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
     </style>
     
   <script type="importmap">

@@ -84,23 +84,26 @@ const App: React.FC = () => {
           <video 
             ref={(video) => {
               if (video) {
-                // Force remove all controls and attributes that might show buttons
                 video.muted = true;
                 video.loop = true;
                 video.playsInline = true;
+                video.controls = false;
                 video.setAttribute('webkit-playsinline', 'true');
                 video.setAttribute('playsinline', 'true');
                 video.removeAttribute('controls');
-                video.controls = false;
-                video.setAttribute('controls', 'false');
                 video.style.pointerEvents = 'none';
-                video.style.webkitTapHighlightColor = 'transparent';
-                // Hide any native controls that might appear
-                video.addEventListener('loadedmetadata', () => {
-                  video.controls = false;
-                  video.removeAttribute('controls');
-                });
-                // Ensure video plays on mobile
+                
+                // Hide controls via CSS
+                video.style.outline = 'none';
+                
+                // Ensure video plays and stays playing
+                const ensurePlaying = () => {
+                  if (video.paused) {
+                    video.play().catch(() => {});
+                  }
+                };
+                
+                // Try to play immediately
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
                   playPromise.catch(() => {
@@ -114,19 +117,21 @@ const App: React.FC = () => {
                     document.addEventListener('click', tryPlay, { once: true });
                   });
                 }
+                
+                // Continuously ensure video is playing
+                video.addEventListener('pause', ensurePlaying);
+                video.addEventListener('ended', () => video.play());
               }
             }}
+            controls={false}
             autoPlay 
             loop 
             muted 
             playsInline
             preload="auto"
-            controls={false}
-            controlsList="nodownload nofullscreen noremoteplayback"
-            disablePictureInPicture
             className="w-full h-full object-cover -z-50"
             aria-hidden="true"
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: 'none', outline: 'none' }}
           >
             <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
              {/* Fallback stock video of vertical farming/technology */}

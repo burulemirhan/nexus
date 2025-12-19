@@ -159,23 +159,24 @@ const DefenseSpace: React.FC = () => {
                  <video
                    ref={(video) => {
                      if (video) {
-                       // Force remove all controls and attributes that might show buttons
                        video.muted = true;
                        video.loop = true;
                        video.playsInline = true;
+                       video.controls = false;
                        video.setAttribute('webkit-playsinline', 'true');
                        video.setAttribute('playsinline', 'true');
                        video.removeAttribute('controls');
-                       video.controls = false;
-                       video.setAttribute('controls', 'false');
                        video.style.pointerEvents = 'none';
-                       video.style.webkitTapHighlightColor = 'transparent';
-                       // Hide any native controls that might appear
-                       video.addEventListener('loadedmetadata', () => {
-                         video.controls = false;
-                         video.removeAttribute('controls');
-                       });
-                       // Ensure video plays on mobile
+                       video.style.outline = 'none';
+                       
+                       // Ensure video plays and stays playing
+                       const ensurePlaying = () => {
+                         if (video.paused) {
+                           video.play().catch(() => {});
+                         }
+                       };
+                       
+                       // Try to play immediately
                        const playPromise = video.play();
                        if (playPromise !== undefined) {
                          playPromise.catch(() => {
@@ -189,8 +190,13 @@ const DefenseSpace: React.FC = () => {
                            document.addEventListener('click', tryPlay, { once: true });
                          });
                        }
+                       
+                       // Continuously ensure video is playing
+                       video.addEventListener('pause', ensurePlaying);
+                       video.addEventListener('ended', () => video.play());
                      }
                    }}
+                   controls={false}
                    className="absolute inset-0 w-full h-full object-cover opacity-90"
                    src={`${BASE_URL}assets/videos/moon.mp4`}
                    autoPlay
@@ -198,11 +204,8 @@ const DefenseSpace: React.FC = () => {
                    loop
                    playsInline
                    preload="auto"
-                   controls={false}
-                   controlsList="nodownload nofullscreen noremoteplayback"
-                   disablePictureInPicture
                    aria-hidden="true"
-                   style={{ pointerEvents: 'none' }}
+                   style={{ pointerEvents: 'none', outline: 'none' }}
                  />
                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20 pointer-events-none" />
 
