@@ -21,31 +21,30 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
 
   useEffect(() => {
     let rafId: number | null = null;
-    
-    const handleScroll = () => {
-      // Cancel any pending animation frame
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-      
-      // Throttle with requestAnimationFrame for smooth performance
-      rafId = requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        
-        if (isMenuOpen || currentScrollY < 10) {
-          setIsVisible(true);
-          lastScrollY.current = currentScrollY;
-          return;
-        }
+    let ticking = false;
 
-        if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
-          setIsVisible(false);
-        } else if (currentScrollY < lastScrollY.current) {
-          setIsVisible(true);
-        }
-        
-        lastScrollY.current = currentScrollY;
-      });
+    const handleScroll = () => {
+      if (!ticking) {
+        rafId = requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          
+          if (isMenuOpen || currentScrollY < 10) {
+            setIsVisible(true);
+            lastScrollY.current = currentScrollY;
+            ticking = false;
+            return;
+          }
+
+          if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
+            setIsVisible(false);
+          } else if (currentScrollY < lastScrollY.current) {
+            setIsVisible(true);
+          }
+          
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -112,7 +111,7 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
       className={`fixed top-2 md:top-3 left-0 w-full z-50 transition-opacity duration-300 ease-out ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
-      style={{ willChange: isVisible ? 'opacity' : 'auto', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+      style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
     >
       <div className="w-full px-4 md:px-8 h-16 md:h-18 flex items-center justify-between">
         <div className="flex items-center gap-2 pt-1">
@@ -121,8 +120,7 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
              onClick={() => {
                const basePath = location.pathname.startsWith('/en') ? '/en' : '/';
                navigate(basePath);
-               // Scroll handled by ScrollToTop component
-              // No need to manually scroll here
+               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
              }}
              className={`font-tesla font-bold text-3xl md:text-[34px] tracking-wider ${darkMode ? 'text-black' : 'text-white drop-shadow-md'} hover:opacity-80 transition-opacity cursor-pointer`}
            >
@@ -131,7 +129,7 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
         </div>
 
         {/* Desktop Menu */}
-        <div className={`hidden md:flex items-center gap-7 px-7 py-2 ${darkMode ? 'bg-white/90 border border-black/15' : 'bg-black/30 border border-white/15'} rounded-lg text-[11px] md:text-xs font-display font-bold tracking-widest uppercase ${darkMode ? 'text-black' : 'text-white'} shadow-lg`} style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
+        <div className={`hidden md:flex items-center gap-7 px-7 py-2 ${darkMode ? 'bg-white/80 backdrop-blur-sm border border-black/15' : 'bg-black/18 backdrop-blur-sm border border-white/15'} rounded-lg text-[11px] md:text-xs font-display font-bold tracking-widest uppercase ${darkMode ? 'text-black' : 'text-white'} shadow-lg`}>
           <a href="#vizyon" className={darkMode ? "text-black/70 hover:text-black transition-colors" : "text-white/70 hover:text-white transition-colors"}>{t('nav.vision')}</a>
           <a href="#technology" className={darkMode ? "text-black/70 hover:text-black transition-colors" : "text-white/70 hover:text-white transition-colors"}>{t('nav.technology')}</a>
           <a href="#engineering" className={darkMode ? "text-black/70 hover:text-black transition-colors" : "text-white/70 hover:text-white transition-colors"}>{t('nav.articles')}</a>
@@ -149,7 +147,7 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
               <ChevronDown className={`w-3 h-3 transition-transform ${isLangOpen ? 'rotate-180' : ''} ${darkMode ? 'text-black/70' : 'text-white/70'}`} />
             </button>
             {isLangOpen && (
-              <div className={`absolute top-full right-0 mt-1 ${darkMode ? 'bg-white/98 border border-black/20' : 'bg-black/95 border border-white/10'} rounded-md shadow-lg overflow-hidden min-w-[66px]`} style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
+              <div className={`absolute top-full right-0 mt-1 ${darkMode ? 'bg-white/95 backdrop-blur-md border border-black/20' : 'bg-black/85 backdrop-blur-md border border-white/10'} rounded-md shadow-lg overflow-hidden min-w-[66px]`}>
                 <button
                   onClick={() => handleLanguageChange('tr')}
                   className={`w-full px-3 py-[7px] text-[10px] text-left transition-colors ${
@@ -187,7 +185,7 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className={`md:hidden fixed inset-0 ${darkMode ? 'bg-white/98' : 'bg-nexus-dark/98'} p-6 flex flex-col justify-center gap-4 text-lg font-tesla tracking-widest uppercase z-50 ${darkMode ? 'text-black' : 'text-white'}`} style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
+        <div className={`md:hidden fixed inset-0 ${darkMode ? 'bg-white/95 backdrop-blur-md' : 'bg-nexus-dark/95 backdrop-blur-md'} p-6 flex flex-col justify-center gap-4 text-lg font-tesla tracking-widest uppercase z-50 ${darkMode ? 'text-black' : 'text-white'}`}>
            <button 
              className={`absolute top-6 right-6 p-3 ${darkMode ? 'text-black' : 'text-white'} touch-manipulation`}
              onClick={() => setIsMenuOpen(false)}
@@ -256,7 +254,7 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
                <ChevronDown className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''} ${darkMode ? 'text-black/70' : 'text-white/70'}`} />
              </button>
              {isLangOpen && (
-               <div className={`mt-2 ${darkMode ? 'bg-white/98 border border-black/20' : 'bg-black/95 border border-white/10'} rounded-md overflow-hidden`} style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
+               <div className={`mt-2 ${darkMode ? 'bg-white/95 backdrop-blur-md border border-black/20' : 'bg-black/85 backdrop-blur-md border border-white/10'} rounded-md overflow-hidden`}>
                  <button
                    onClick={() => {
                      handleLanguageChange('tr');

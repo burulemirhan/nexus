@@ -36,16 +36,21 @@ img, video {
   display: block;
 }
 
-/* Reduce layout shift for images and optimize rendering */
+/* Reduce layout shift for images - optimized for performance */
 img {
   content-visibility: auto;
   transform: translateZ(0);
-  will-change: auto;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Smooth scroll behavior - disabled when using Lenis */
-html {
-  scroll-behavior: auto; /* Lenis handles smooth scrolling */
+html.lenis {
+  scroll-behavior: auto !important;
+}
+
+html:not(.lenis) {
+  scroll-behavior: smooth;
 }
 
 /* Focus styles for accessibility */
@@ -94,9 +99,15 @@ html {
   background: #555;
 }
 
-/* Lenis smooth scrolling - performance optimized */
-html.lenis, html.lenis body {
+/* Lenis smooth scrolling - optimized for performance */
+html.lenis, 
+html.lenis body {
   height: auto;
+  overflow-x: hidden;
+}
+
+html.lenis {
+  scroll-behavior: auto !important;
 }
 
 .lenis.lenis-smooth {
@@ -115,78 +126,53 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
-/* Performance optimizations for smooth scrolling */
-section {
-  contain: layout style paint;
-  content-visibility: auto;
-}
-
-/* GPU acceleration for fixed elements and scrolling */
-nav {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: opacity, transform;
-}
-
-/* Optimize video rendering - avoid will-change during scroll */
+/* Performance optimizations - GPU acceleration */
 video {
   transform: translateZ(0);
-  contain: strict;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Optimize fixed backgrounds */
+img {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optimize fixed elements for smooth scrolling */
 .fixed {
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Reduce repaints during scroll */
+/* Optimize sections for better scrolling performance */
+section {
+  transform: translateZ(0);
+}
+
+/* Optimize navbar for smooth animations */
+nav {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optimize background containers */
+.absolute.inset-0,
+.fixed.inset-0 {
+  transform: translateZ(0);
+}
+
+/* Optimize transitions for better performance */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Optimize transitions - only on non-scrolling properties */
-@media (prefers-reduced-motion: no-preference) {
-  * {
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* Optimize opacity transitions */
-.transition-opacity,
-[class*="transition"] {
-  will-change: auto;
-}
-
-/* Only apply will-change when actually transitioning */
-.transition-opacity:hover,
-.transition-opacity:focus {
-  will-change: opacity;
-}
-
-/* Optimize scrolling performance - use transform instead of position changes */
-html {
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Prevent layout thrashing */
+/* Reduce repaints - optimize text rendering */
 body {
-  transform: translateZ(0);
-}
-
-/* Optimize section rendering */
-section {
-  isolation: isolate;
-}
-
-/* Reduce paint complexity */
-main {
-  contain: layout style;
+  text-rendering: optimizeLegibility;
 }
 
 /* Hide scrollbar utility */

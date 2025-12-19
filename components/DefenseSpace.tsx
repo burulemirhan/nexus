@@ -66,7 +66,7 @@ const DefenseSpace: React.FC = () => {
   );
 
   return (
-    <section id="defense" className="min-h-screen flex items-center py-16 md:py-24 relative bg-black overflow-hidden" style={{ willChange: 'scroll-position', contentVisibility: 'auto' }}>
+    <section id="defense" className="min-h-screen flex items-center py-16 md:py-24 relative bg-black overflow-hidden">
 
       <div className="w-full px-4 md:px-12 relative z-10 flex flex-col justify-center min-h-full">
         
@@ -171,7 +171,6 @@ const DefenseSpace: React.FC = () => {
                        // Performance optimizations
                        video.style.transform = 'translateZ(0)';
                        video.style.willChange = 'auto';
-                       video.style.contain = 'strict';
                        
                        // Ensure video plays and stays playing
                        const ensurePlaying = () => {
@@ -209,7 +208,7 @@ const DefenseSpace: React.FC = () => {
                    playsInline
                    preload="auto"
                    aria-hidden="true"
-                   style={{ pointerEvents: 'none', outline: 'none' }}
+                   style={{ pointerEvents: 'none', outline: 'none', transform: 'translateZ(0)' }}
                  />
                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20 pointer-events-none" />
 

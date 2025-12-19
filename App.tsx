@@ -10,6 +10,7 @@ import Services from './components/Services';
 import Footer from './components/Footer';
 import SEOHead from './components/SEOHead';
 import Preloader from './components/Preloader';
+import Lenis from 'lenis';
 
 // @ts-ignore - Vite provides BASE_URL via import.meta.env
 const BASE_URL = import.meta.env.BASE_URL || '/';
@@ -25,8 +26,52 @@ const App: React.FC = () => {
     document.documentElement.lang = htmlLang;
   }, [location.pathname]);
 
-  // Lenis is now managed globally by LenisProvider
-  // No need to initialize it here
+  useEffect(() => {
+    // Initialize Lenis for smooth scrolling with performance optimizations
+    const lenis = new Lenis({
+      duration: 1.2, // Slightly longer for smoother feel
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 0.8, // Reduced for smoother scrolling
+      touchMultiplier: 1.5, // Reduced for better performance
+      infinite: false,
+    });
+
+    let rafId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+
+    rafId = requestAnimationFrame(raf);
+
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+      if (anchor) {
+        const href = anchor.getAttribute('href');
+        if (href?.startsWith('#')) {
+          e.preventDefault();
+          const element = document.querySelector(href) as HTMLElement;
+          if (element) {
+            lenis.scrollTo(element, { offset: 0 });
+          }
+        }
+      }
+    };
+
+    document.addEventListener('click', handleAnchorClick);
+
+    return () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      lenis.destroy();
+      document.removeEventListener('click', handleAnchorClick);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-nexus-copper selection:text-white font-tech text-white">
@@ -39,7 +84,7 @@ const App: React.FC = () => {
       <SEOHead />
       
       {/* Global Background Video (Vertical Farming Theme) */}
-      <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" aria-hidden="true" style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
+      <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" aria-hidden="true">
         <div className="absolute inset-0 w-full h-full">
           <video 
             ref={(video) => {
@@ -56,7 +101,6 @@ const App: React.FC = () => {
                 // Performance optimizations
                 video.style.transform = 'translateZ(0)';
                 video.style.willChange = 'auto';
-                video.style.contain = 'strict';
                 
                 // Ensure video plays and stays playing
                 const ensurePlaying = () => {
@@ -93,7 +137,7 @@ const App: React.FC = () => {
             preload="auto"
             className="w-full h-full object-cover -z-50"
             aria-hidden="true"
-            style={{ pointerEvents: 'none', outline: 'none' }}
+            style={{ pointerEvents: 'none', outline: 'none', transform: 'translateZ(0)' }}
           >
             <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
              {/* Fallback stock video of vertical farming/technology */}

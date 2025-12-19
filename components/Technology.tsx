@@ -38,7 +38,7 @@ const Technology: React.FC = () => {
   const activeTech = technologies[activeTab];
 
   return (
-    <section id="technology" className="min-h-screen flex flex-col justify-center py-16 md:py-24 relative bg-nexus-dark overflow-hidden" style={{ willChange: 'scroll-position', contentVisibility: 'auto' }}>
+    <section id="technology" className="min-h-screen flex flex-col justify-center py-16 md:py-24 relative bg-nexus-dark overflow-hidden">
        {/* Background Subtle Gradient */}
        <div className="absolute inset-0 bg-gradient-to-br from-black via-nexus-dark to-black" />
        
