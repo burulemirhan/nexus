@@ -56,21 +56,6 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
     };
   }, [isMenuOpen]);
 
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, [isMenuOpen]);
-
   // Close lang dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -83,13 +68,21 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
     };
     if (isLangOpen) {
       document.addEventListener('mousedown', handler);
-      document.addEventListener('touchstart', handler);
+    }
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isLangOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
     return () => {
-      document.removeEventListener('mousedown', handler);
-      document.removeEventListener('touchstart', handler);
+      document.body.style.overflow = '';
     };
-  }, [isLangOpen]);
+  }, [isMenuOpen]);
 
   const handleLanguageChange = (lang: 'tr' | 'en') => {
     setLanguage(lang);
@@ -202,107 +195,117 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Full Screen Popup */}
       {isMenuOpen && (
-        <div className={`md:hidden fixed inset-0 ${darkMode ? 'bg-white/95 backdrop-blur-md' : 'bg-nexus-dark/95 backdrop-blur-md'} p-6 flex flex-col justify-center gap-3 text-xs font-display font-bold tracking-widest uppercase z-[9999] ${darkMode ? 'text-black' : 'text-white'}`} style={{ transform: 'translateZ(0)' }}>
-           <button 
-             className={`absolute top-6 right-6 p-3 ${darkMode ? 'text-black' : 'text-white'} touch-manipulation`}
-             onClick={() => setIsMenuOpen(false)}
-             aria-label="Close menu"
-             style={{ minHeight: '44px', minWidth: '44px', zIndex: 10000 }}
-           >
-             <X className="w-7 h-7" />
-           </button>
-           <a 
-             href="#vizyon" 
-             onClick={() => setIsMenuOpen(false)} 
-             className={`py-3 px-2 ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
-             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
-           >
-             {t('nav.vision')}
-           </a>
-           <a 
-             href="#technology" 
-             onClick={() => setIsMenuOpen(false)} 
-             className={`py-3 px-2 ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
-             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
-           >
-             {t('nav.technology')}
-           </a>
-           <a 
-             href="#engineering" 
-             onClick={() => setIsMenuOpen(false)} 
-             className={`py-3 px-2 ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
-             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
-           >
-             {t('nav.articles')}
-           </a>
-           <a 
-             href="#defense" 
-             onClick={() => setIsMenuOpen(false)} 
-             className={`py-3 px-2 ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
-             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
-           >
-             {t('nav.defense')}
-           </a>
-           <a 
-             href="#services" 
-             onClick={() => setIsMenuOpen(false)} 
-             className={`py-3 px-2 ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
-             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
-           >
-             {t('nav.services')}
-           </a>
-           <a 
-             href="#contact" 
-             onClick={() => setIsMenuOpen(false)} 
-             className={`py-3 px-2 ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
-             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
-           >
-             {t('nav.contact')}
-           </a>
-           
-           {/* Mobile Language Dropdown */}
-           <div className={`relative mt-6 pt-6 border-t ${darkMode ? 'border-black/10' : 'border-white/10'}`} ref={mobileLangRef}>
-             <button
-               onClick={() => setIsLangOpen((o) => !o)}
-               className={`flex items-center justify-center gap-2 w-full px-4 py-3 text-xs font-display font-bold tracking-widest uppercase ${darkMode ? 'text-black/70 hover:text-black active:text-black' : 'text-white/70 hover:text-white active:text-white'} transition-colors touch-manipulation`}
-               style={{ minHeight: '44px' }}
-             >
-               {language.toUpperCase()}
-               <ChevronDown className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''} ${darkMode ? 'text-black/70' : 'text-white/70'}`} />
-             </button>
-             {isLangOpen && (
-               <div className={`mt-2 ${darkMode ? 'bg-white/95 backdrop-blur-md border border-black/20' : 'bg-black/85 backdrop-blur-md border border-white/10'} rounded-md overflow-hidden`}>
-                 <button
-                   onClick={() => {
-                     handleLanguageChange('tr');
-                     setIsMenuOpen(false);
-                   }}
-                   className={`w-full px-4 py-3 text-left text-xs font-display font-bold tracking-widest uppercase transition-colors touch-manipulation ${
-                     language === 'tr'
-                      ? darkMode ? 'text-black bg-black/10' : 'text-white bg-white/10'
-                       : darkMode ? 'text-black/70 hover:text-black hover:bg-black/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                   }`}
-                 >
-                   TR
-                 </button>
-                 <button
-                   onClick={() => {
-                     handleLanguageChange('en');
-                     setIsMenuOpen(false);
-                   }}
-                   className={`w-full px-4 py-3 text-left text-xs font-display font-bold tracking-widest uppercase transition-colors touch-manipulation ${
-                     language === 'en'
-                      ? darkMode ? 'text-black bg-black/10' : 'text-white bg-white/10'
-                       : darkMode ? 'text-black/70 hover:text-black hover:bg-black/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                   }`}
-                 >
-                   EN
-                 </button>
-               </div>
-             )}
-           </div>
+        <div 
+          className={`md:hidden fixed inset-0 ${darkMode ? 'bg-white' : 'bg-nexus-dark'} z-[9999] flex flex-col`}
+          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
+        >
+          {/* Close Button */}
+          <div className="flex justify-end p-4 md:p-6">
+            <button 
+              className={`p-3 ${darkMode ? 'text-black' : 'text-white'} touch-manipulation`}
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="Close menu"
+              style={{ minHeight: '44px', minWidth: '44px' }}
+            >
+              <X className="w-7 h-7" />
+            </button>
+          </div>
+
+          {/* Menu Items - Centered */}
+          <div className="flex-1 flex flex-col justify-center items-center gap-6 px-6">
+            <a 
+              href="#vizyon" 
+              onClick={() => setIsMenuOpen(false)} 
+              className={`text-xs font-display font-bold tracking-widest uppercase ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
+              style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
+            >
+              {t('nav.vision')}
+            </a>
+            <a 
+              href="#technology" 
+              onClick={() => setIsMenuOpen(false)} 
+              className={`text-xs font-display font-bold tracking-widest uppercase ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
+              style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
+            >
+              {t('nav.technology')}
+            </a>
+            <a 
+              href="#engineering" 
+              onClick={() => setIsMenuOpen(false)} 
+              className={`text-xs font-display font-bold tracking-widest uppercase ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
+              style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
+            >
+              {t('nav.articles')}
+            </a>
+            <a 
+              href="#defense" 
+              onClick={() => setIsMenuOpen(false)} 
+              className={`text-xs font-display font-bold tracking-widest uppercase ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
+              style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
+            >
+              {t('nav.defense')}
+            </a>
+            <a 
+              href="#services" 
+              onClick={() => setIsMenuOpen(false)} 
+              className={`text-xs font-display font-bold tracking-widest uppercase ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
+              style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
+            >
+              {t('nav.services')}
+            </a>
+            <a 
+              href="#contact" 
+              onClick={() => setIsMenuOpen(false)} 
+              className={`text-xs font-display font-bold tracking-widest uppercase ${darkMode ? "text-black/70 hover:text-black active:text-black" : "text-white/70 hover:text-white active:text-white"} transition-colors touch-manipulation`}
+              style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
+            >
+              {t('nav.contact')}
+            </a>
+            
+            {/* Mobile Language Switcher */}
+            <div className={`mt-8 pt-8 border-t ${darkMode ? 'border-black/10' : 'border-white/10'} w-full flex flex-col items-center`} ref={mobileLangRef}>
+              <button
+                onClick={() => setIsLangOpen((o) => !o)}
+                className={`flex items-center justify-center gap-2 px-4 py-3 text-xs font-display font-bold tracking-widest uppercase ${darkMode ? 'text-black/70 hover:text-black active:text-black' : 'text-white/70 hover:text-white active:text-white'} transition-colors touch-manipulation`}
+                style={{ minHeight: '44px' }}
+              >
+                {language.toUpperCase()}
+                <ChevronDown className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''} ${darkMode ? 'text-black/70' : 'text-white/70'}`} />
+              </button>
+              {isLangOpen && (
+                <div className={`mt-3 ${darkMode ? 'bg-white/95 backdrop-blur-md border border-black/20' : 'bg-black/85 backdrop-blur-md border border-white/10'} rounded-md overflow-hidden`}>
+                  <button
+                    onClick={() => {
+                      handleLanguageChange('tr');
+                      setIsMenuOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left text-xs font-display font-bold tracking-widest uppercase transition-colors touch-manipulation ${
+                      language === 'tr'
+                       ? darkMode ? 'text-black bg-black/10' : 'text-white bg-white/10'
+                        : darkMode ? 'text-black/70 hover:text-black hover:bg-black/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    TR
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleLanguageChange('en');
+                      setIsMenuOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left text-xs font-display font-bold tracking-widest uppercase transition-colors touch-manipulation ${
+                      language === 'en'
+                       ? darkMode ? 'text-black bg-black/10' : 'text-white bg-white/10'
+                        : darkMode ? 'text-black/70 hover:text-black hover:bg-black/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    EN
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </nav>
