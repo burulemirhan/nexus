@@ -6,6 +6,8 @@ import SEOHead from '../components/SEOHead';
 import { useLanguage } from '../contexts/LanguageContext';
 import Lenis from 'lenis';
 
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
 interface ServicePageProps {
   titleKey: string;
   subtitleKey: string;
@@ -40,6 +42,14 @@ const ServicePage: React.FC<ServicePageProps> = ({
   const [isContactOpen, setIsContactOpen] = useState(false);
   const lenisRef = useRef<Lenis | null>(null);
 
+  // Helper function to prepend BASE_URL to paths starting with /
+  const getAssetPath = (path: string | undefined): string | undefined => {
+    if (!path) return path;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    if (path.startsWith('/')) return `${BASE_URL}${path.substring(1)}`;
+    return `${BASE_URL}${path}`;
+  };
+
   // Prevent browser scroll restoration
   useEffect(() => {
     if ('scrollRestoration' in history) {
@@ -49,35 +59,26 @@ const ServicePage: React.FC<ServicePageProps> = ({
 
   // Set scroll position synchronously before browser paints
   useLayoutEffect(() => {
-    // Disable smooth scrolling temporarily
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    
     // Set scroll position immediately without any animation or delay
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // Also reset Lenis if it exists - do this BEFORE restoring scroll behavior
+    // Also reset Lenis if it exists
     if (lenisRef.current) {
-      try {
-        lenisRef.current.scrollTo(0, { immediate: true });
-      } catch (e) {
-        // Lenis might not be fully initialized yet
-      }
+      lenisRef.current.scrollTo(0, { immediate: true });
     }
     
-    // Force immediate scroll again
+    // Disable smooth scrolling temporarily
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    
+    // Force immediate scroll
     window.scrollTo(0, 0);
     
     // Restore original scroll behavior after setting position
     setTimeout(() => {
       document.documentElement.style.scrollBehavior = originalScrollBehavior;
-      // One more scroll reset after scroll behavior is restored
-      window.scrollTo(0, 0);
-      if (lenisRef.current) {
-        lenisRef.current.scrollTo(0, { immediate: true });
-      }
     }, 0);
   }, [location.pathname]);
 
@@ -101,14 +102,17 @@ const ServicePage: React.FC<ServicePageProps> = ({
 
   useEffect(() => {
     // Ensure we start at top BEFORE initializing Lenis
-    // Disable smooth scrolling before reset
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    
-    // Reset scroll multiple times to ensure it sticks
+    // Do this multiple times to ensure it sticks
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+    
+    // Force scroll reset again after a microtask
+    Promise.resolve().then(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
 
     const lenis = new Lenis({
       duration: 1.0,
@@ -123,24 +127,20 @@ const ServicePage: React.FC<ServicePageProps> = ({
     lenisRef.current = lenis;
 
     // Set scroll position to 0 immediately when Lenis initializes
+    // Multiple attempts to ensure it works
     lenis.scrollTo(0, { immediate: true });
-    
-    // Restore scroll behavior and ensure we're at top
     setTimeout(() => {
-      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      lenis.scrollTo(0, { immediate: true });
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-      lenis.scrollTo(0, { immediate: true });
     }, 0);
     
-    // Final check after a short delay
+    // One more attempt after Lenis has had time to initialize
     setTimeout(() => {
+      lenis.scrollTo(0, { immediate: true });
       window.scrollTo(0, 0);
-      if (lenisRef.current) {
-        lenisRef.current.scrollTo(0, { immediate: true });
-      }
-    }, 50);
+    }, 100);
 
     function raf(time: number) {
       lenis.raf(time);
@@ -197,9 +197,9 @@ const ServicePage: React.FC<ServicePageProps> = ({
               muted 
               playsInline
               className="w-full h-full object-cover -z-50"
-              poster={`${import.meta.env.BASE_URL}assets/images/bg.png`}
+              poster={`${BASE_URL}assets/images/bg.png`}
             >
-              <source src={`${import.meta.env.BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
+              <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
               <source src="https://videos.pexels.com/video-files/5427845/5427845-uhd_2560_1440_24fps.mp4" type="video/mp4" />
             </video>
           </div>
@@ -222,7 +222,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
           {heroBackgroundImage && (
             <div className="absolute inset-0 z-0">
               <img 
-                src={heroBackgroundImage}
+                src={getAssetPath(heroBackgroundImage)}
                 alt=""
                 className="w-full h-full object-cover"
                 loading="eager"
@@ -260,7 +260,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
                           <div className="w-full md:w-1/2">
                             <div className="relative w-full aspect-video md:aspect-square overflow-hidden rounded-lg">
                               <img 
-                                src={featureImage} 
+                                src={getAssetPath(featureImage)} 
                                 alt={t(`${key}.title`)}
                                 loading="lazy"
                                 decoding="async"
@@ -297,7 +297,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
                       {featureImages.map((img, index) => (
                         <div key={index} className="relative w-full aspect-video overflow-hidden rounded-lg">
                           <img 
-                            src={img} 
+                            src={getAssetPath(img)} 
                             alt={`Feature ${index + 1}`}
                             loading="lazy"
                             decoding="async"

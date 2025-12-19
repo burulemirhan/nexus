@@ -1,6 +1,8 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
 const DefenseSpace: React.FC = () => {
   const { t } = useLanguage();
   const [animatedDefenseTitle, setAnimatedDefenseTitle] = useState(t('defense.defense'));
@@ -156,7 +158,7 @@ const DefenseSpace: React.FC = () => {
                  {/* Background video fills box */}
                  <video
                    className="absolute inset-0 w-full h-full object-cover opacity-90"
-                   src={`${import.meta.env.BASE_URL}assets/videos/moon.mp4`}
+                   src={`${BASE_URL}assets/videos/moon.mp4`}
                    autoPlay
                    muted
                    loop

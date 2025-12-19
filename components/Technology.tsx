@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
 const Technology: React.FC = () => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState(0);
@@ -119,7 +121,7 @@ const Technology: React.FC = () => {
                  {/* Image Content */}
                  <div className="relative w-full h-full animate-in zoom-in-95 fade-in duration-1000" key={`img-${activeTech.id}`}>
                     <img 
-                        src={`${import.meta.env.BASE_URL}assets/images/${activeTech.id}.png`} 
+                        src={`${BASE_URL}assets/images/${activeTech.id}.png`} 
                         alt={`${activeTech.name} - ${activeTech.subtitle}`}
                         loading="lazy"
                         decoding="async"

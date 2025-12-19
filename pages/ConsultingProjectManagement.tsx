@@ -13,8 +13,6 @@ const ConsultingProjectManagement: React.FC = () => {
     ? ['service4.process1', 'service4.process2', 'service4.process3', 'service4.process4']
     : ['service4.process1', 'service4.process2', 'service4.process3', 'service4.process4'];
 
-  const baseUrl = import.meta.env.BASE_URL;
-  
   return (
     <ServicePage
       titleKey="services.service4.title"
@@ -23,7 +21,7 @@ const ConsultingProjectManagement: React.FC = () => {
       featuresKey={featuresKey}
       processKey={processKey}
       customBackground="white"
-      heroBackgroundImage={`${baseUrl}assets/images/bg5.png`}
+      heroBackgroundImage="/assets/images/bg5.png"
     />
   );
 };

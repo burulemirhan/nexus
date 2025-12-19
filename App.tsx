@@ -11,6 +11,8 @@ import Footer from './components/Footer';
 import SEOHead from './components/SEOHead';
 import Lenis from 'lenis';
 
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -79,7 +81,7 @@ const App: React.FC = () => {
             className="w-full h-full object-cover -z-50"
             aria-hidden="true"
           >
-            <source src={`${import.meta.env.BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
+            <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
              {/* Fallback stock video of vertical farming/technology */}
              <source src="https://videos.pexels.com/video-files/5427845/5427845-uhd_2560_1440_24fps.mp4" type="video/mp4" />
           </video>
