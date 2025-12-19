@@ -45,7 +45,7 @@ const Services: React.FC = () => {
       <div className="pointer-events-none absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-nexus-dark/50" />
       <div className="w-full px-6 md:px-12 relative z-10 flex flex-col justify-center min-h-full">
         
-        <h2 className="font-tesla font-bold text-3xl md:text-5xl text-white uppercase mb-10 tracking-tight" style={{ fontFamily: 'Barlow', height: '44px' }}>
+        <h2 className="font-tesla font-bold text-2xl md:text-5xl text-white uppercase mb-8 md:mb-10 tracking-tight" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 5vw, 3rem)' }}>
           {t('services.title')}
         </h2>
 
@@ -54,25 +54,27 @@ const Services: React.FC = () => {
             <div 
               key={service.id} 
               onClick={() => navigate(service.path)}
-              className="group flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 py-7 md:py-8 hover:bg-white/5 transition-colors cursor-pointer"
+              className="group flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 py-5 md:py-8 hover:bg-white/5 active:bg-white/10 transition-colors cursor-pointer touch-manipulation"
+              style={{ minHeight: '60px', paddingTop: '1.25rem', paddingBottom: '1.25rem' }}
             >
-              <div className="flex items-baseline gap-4 md:gap-8">
-                <span className="font-mono text-emerald-500 text-[11px] md:text-xs">{service.id}</span>
-                <h3 className="font-tesla font-bold text-lg md:text-2xl text-white tracking-wide" style={{ fontFamily: 'Barlow' }}>{service.title}</h3>
+              <div className="flex items-baseline gap-3 md:gap-8">
+                <span className="font-mono text-emerald-500 text-xs md:text-xs" style={{ fontSize: '16px' }}>{service.id}</span>
+                <h3 className="font-tesla font-bold text-xl md:text-2xl text-white tracking-wide" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>{service.title}</h3>
                </div>
-              <div className="flex items-center gap-5 mt-3 md:mt-0">
-                 <p className="font-tech text-white/40 text-[11px] md:text-sm">{service.desc}</p>
-                 <ArrowUpRight className="text-white/20 group-hover:text-white transition-colors w-4 h-4 md:w-5 md:h-5" />
+              <div className="flex items-center gap-4 md:gap-5 mt-2 md:mt-0">
+                 <p className="font-tech text-white/40 text-sm md:text-sm" style={{ fontSize: '16px' }}>{service.desc}</p>
+                 <ArrowUpRight className="text-white/20 group-hover:text-white transition-colors w-5 h-5 md:w-5 md:h-5 flex-shrink-0" />
                </div>
             </div>
           ))}
           <div className="border-t border-white/10"></div>
         </div>
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-10 md:mt-12 flex justify-center">
            <button
              onClick={() => setIsContactOpen(true)}
-             className="px-10 md:px-12 py-3 md:py-3.5 bg-transparent text-white border border-white/60 hover:bg-white hover:text-black transition-all duration-300 rounded-lg font-display font-bold uppercase tracking-widest text-xs md:text-sm"
+             className="px-8 md:px-12 py-3.5 md:py-3.5 bg-transparent text-white border border-white/60 hover:bg-white hover:text-black active:bg-white/90 active:text-black transition-all duration-300 rounded-lg font-display font-bold uppercase tracking-widest touch-manipulation"
+             style={{ minHeight: '44px', fontSize: '16px' }}
            >
              {t('services.button')}
            </button>
@@ -91,9 +93,10 @@ const Services: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-3 right-3 text-white/40 hover:text-white text-sm"
+              className="absolute top-4 right-4 text-white/40 hover:text-white active:text-white text-lg touch-manipulation"
               onClick={() => setIsContactOpen(false)}
               aria-label="Close contact details"
+              style={{ minHeight: '44px', minWidth: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               ✕
             </button>

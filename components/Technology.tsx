@@ -38,27 +38,27 @@ const Technology: React.FC = () => {
   const activeTech = technologies[activeTab];
 
   return (
-    <section id="technology" className="min-h-screen flex flex-col justify-center py-24 relative bg-nexus-dark overflow-hidden">
+    <section id="technology" className="min-h-screen flex flex-col justify-center py-16 md:py-24 relative bg-nexus-dark overflow-hidden">
        {/* Background Subtle Gradient */}
        <div className="absolute inset-0 bg-gradient-to-br from-black via-nexus-dark to-black" />
        
        <div className="w-full px-6 md:px-12 relative z-10 flex flex-col h-full max-w-[90rem] mx-auto justify-center">
           
           {/* Header Row: Title Left, Tabs Right */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-4 mb-12">
-             <h2 className="font-mono font-bold text-sm md:text-base text-white/60 uppercase tracking-widest mb-6 md:mb-0">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-4 mb-8 md:mb-12">
+             <h2 className="font-mono font-bold text-xs md:text-base text-white/60 uppercase tracking-widest mb-4 md:mb-0" style={{ fontSize: '16px' }}>
                 {t('tech.systemArchitecture')}
              </h2>
 
-             <div className="flex items-center gap-8 md:gap-16 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
+             <div className="flex items-center gap-6 md:gap-16 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide -mx-6 md:mx-0 px-6 md:px-0">
                 {technologies.map((tech, index) => (
                   <button 
                     key={tech.id}
                     onClick={() => setActiveTab(index)}
-                    className={`relative font-tesla text-lg md:text-xl uppercase tracking-wider transition-all duration-300 pb-2 md:pb-4 whitespace-nowrap outline-none ${
-                      activeTab === index ? 'text-white' : 'text-white/30 hover:text-white/60'
+                    className={`relative font-tesla text-base md:text-xl uppercase tracking-wider transition-all duration-300 pb-3 md:pb-4 whitespace-nowrap outline-none touch-manipulation ${
+                      activeTab === index ? 'text-white' : 'text-white/30 active:text-white/60'
                     }`}
-                    style={{ fontFamily: 'Barlow' }}
+                    style={{ fontFamily: 'Barlow', minHeight: '44px', fontSize: '16px', display: 'flex', alignItems: 'center' }}
                   >
                     {tech.name}
                     {activeTab === index && (
@@ -83,7 +83,7 @@ const Technology: React.FC = () => {
                       {t('tech.prototype')}: {activeTech.id.toUpperCase()}
                    </h3>
                    {/* Title size reduced */}
-                   <h1 className="font-tesla font-bold text-5xl md:text-6xl text-white leading-none tracking-normal" style={{ fontFamily: 'Barlow' }}>
+                   <h1 className="font-tesla font-bold text-4xl md:text-6xl text-white leading-none tracking-normal" style={{ fontFamily: 'Barlow', fontSize: 'clamp(2rem, 8vw, 3.75rem)' }}>
                       {activeTech.name}
                    </h1>
                 </div>
@@ -91,7 +91,7 @@ const Technology: React.FC = () => {
                 <div className="h-[1px] w-16 bg-white/10" />
 
                 {/* Paragraph size reduced */}
-                <p className="font-tech text-white/70 text-sm md:text-base font-light leading-relaxed max-w-lg">
+                <p className="font-tech text-white/70 text-base md:text-base font-light leading-relaxed max-w-lg" style={{ fontSize: '16px' }}>
                    {activeTech.description}
                 </p>
 
@@ -102,8 +102,8 @@ const Technology: React.FC = () => {
                    </span>
                 </div>
                 
-                <button className="group mt-6 flex items-center gap-4 text-white hover:text-emerald-400 transition-colors">
-                  <span className="font-display uppercase tracking-widest text-xs md:text-sm font-bold border-b border-transparent group-hover:border-emerald-400 pb-1">
+                <button className="group mt-6 flex items-center gap-4 text-white active:text-emerald-400 transition-colors touch-manipulation" style={{ minHeight: '44px' }}>
+                  <span className="font-display uppercase tracking-widest text-sm md:text-sm font-bold border-b border-transparent group-hover:border-emerald-400 pb-1" style={{ fontSize: '16px' }}>
                     {t('tech.comingSoon')}
                   </span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />

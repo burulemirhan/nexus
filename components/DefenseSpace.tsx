@@ -66,15 +66,15 @@ const DefenseSpace: React.FC = () => {
   );
 
   return (
-    <section id="defense" className="min-h-screen flex items-center py-22 md:py-24 relative bg-black overflow-hidden">
+    <section id="defense" className="min-h-screen flex items-center py-16 md:py-24 relative bg-black overflow-hidden">
 
-      <div className="w-full px-6 md:px-12 relative z-10 flex flex-col justify-center min-h-full">
+      <div className="w-full px-4 md:px-12 relative z-10 flex flex-col justify-center min-h-full">
         
-        <div className="flex flex-col md:flex-row justify-between items-end mb-14 border-b border-white/10 pb-5 max-w-[90rem] mx-auto w-full">
-          <h2 className="font-tesla font-bold text-3xl md:text-5xl text-white uppercase tracking-tight leading-tight" style={{ fontFamily: 'Barlow' }}>
+        <div className="flex flex-col md:flex-row justify-between items-end mb-10 md:mb-14 border-b border-white/10 pb-4 md:pb-5 max-w-[90rem] mx-auto w-full">
+          <h2 className="font-tesla font-bold text-2xl md:text-5xl text-white uppercase tracking-tight leading-tight" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 5vw, 3rem)' }}>
             {t('defense.title')}
           </h2>
-          <p className="font-mono text-white/50 text-right mt-2 md:mt-0 uppercase tracking-widest text-[11px] md:text-xs">
+          <p className="font-mono text-white/50 text-right mt-3 md:mt-0 uppercase tracking-widest text-xs md:text-xs" style={{ fontSize: '16px' }}>
             {t('defense.subtitle')} <br /> {t('defense.subtitle2')}
           </p>
         </div>
@@ -88,11 +88,11 @@ const DefenseSpace: React.FC = () => {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:22px_22px] opacity-15 pointer-events-none" style={{ transform: 'translateZ(0)' }} />
 
                 <div className="relative z-10 flex justify-between items-stretch h-full px-6 md:px-10 py-10 md:py-12">
-                    <div className="flex flex-col justify-center h-full pr-6 w-full space-y-4 md:space-y-5 text-left max-w-2xl">
-                        <h3 className="font-tesla font-bold text-3xl md:text-4xl text-red-500 tracking-wide group-hover:text-red-400 transition-colors drop-shadow-md" style={{ fontFamily: 'Barlow' }}>
+                    <div className="flex flex-col justify-center h-full pr-4 md:pr-6 w-full space-y-3 md:space-y-5 text-left max-w-2xl">
+                        <h3 className="font-tesla font-bold text-2xl md:text-4xl text-red-500 tracking-wide group-hover:text-red-400 transition-colors drop-shadow-md" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
                           {animatedDefenseTitle}
                         </h3>
-                        <p className="text-white text-base md:text-lg font-light leading-relaxed max-w-xl">
+                        <p className="text-white text-base md:text-lg font-light leading-relaxed max-w-xl" style={{ fontSize: '16px' }}>
                           {t('defense.defenseDesc')}
                             </p>
                     </div>
@@ -154,7 +154,7 @@ const DefenseSpace: React.FC = () => {
             </div>
 
             {/* Uzay - Space area with Video Background */}
-            <div className="group relative overflow-hidden flex flex-col min-h-[640px] md:min-h-[720px]" style={{ willChange: 'auto' }}>
+            <div className="group relative overflow-hidden flex flex-col min-h-[500px] md:min-h-[720px]" style={{ willChange: 'auto' }}>
                  {/* Background video fills box */}
                  <video
                    ref={(video) => {
@@ -209,12 +209,12 @@ const DefenseSpace: React.FC = () => {
                  />
                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20 pointer-events-none" />
 
-                 <div className="relative z-10 flex h-full items-center px-6 md:px-10 py-10 md:py-12">
-                   <div className="flex flex-col gap-4 md:gap-5 max-w-2xl text-left">
-                     <h3 className="font-tesla font-bold text-3xl md:text-4xl text-white tracking-wide drop-shadow-md" style={{ fontFamily: 'Barlow' }}>
+                 <div className="relative z-10 flex h-full items-center px-4 md:px-10 py-8 md:py-12">
+                   <div className="flex flex-col gap-3 md:gap-5 max-w-2xl text-left">
+                     <h3 className="font-tesla font-bold text-2xl md:text-4xl text-white tracking-wide drop-shadow-md" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
                        {t('defense.space')}
                      </h3>
-                     <p className="text-white text-base md:text-lg font-light leading-relaxed">
+                     <p className="text-white text-base md:text-lg font-light leading-relaxed" style={{ fontSize: '16px' }}>
                        {t('defense.spaceDesc')}
                      </p>
                     </div>

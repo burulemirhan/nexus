@@ -277,9 +277,9 @@ const ServicePage: React.FC<ServicePageProps> = ({
               />
             </div>
           )}
-          <div className="w-full px-6 md:px-12 relative z-10 flex flex-col items-center justify-start min-h-full pt-12 md:pt-16">
+          <div className="w-full px-4 md:px-12 relative z-10 flex flex-col items-center justify-start min-h-full pt-12 md:pt-16">
             <div className="max-w-[90rem] mx-auto w-full text-center">
-              <h1 className={`font-tesla font-bold text-4xl md:text-6xl ${isWhiteBackground ? 'text-black' : 'text-white'} uppercase tracking-wider ${isWhiteBackground ? '' : 'drop-shadow-2xl'} leading-[0.9]`} style={{ fontFamily: 'Barlow' }}>
+              <h1 className={`font-tesla font-bold text-3xl md:text-6xl ${isWhiteBackground ? 'text-black' : 'text-white'} uppercase tracking-wider ${isWhiteBackground ? '' : 'drop-shadow-2xl'} leading-[1.1] md:leading-[0.9]`} style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}>
                 {t(titleKey)}
               </h1>
             </div>
@@ -287,10 +287,10 @@ const ServicePage: React.FC<ServicePageProps> = ({
         </section>
 
         {/* Features Section */}
-        <section className={`relative ${featureImagesMap ? 'py-40 md:py-52' : 'py-32 md:py-40'} ${isWhiteBackground ? 'bg-white' : 'bg-nexus-dark/50 backdrop-blur-sm'}`}>
-          <div className="w-full px-6 md:px-12 relative z-10">
+        <section className={`relative ${featureImagesMap ? 'py-20 md:py-52' : 'py-16 md:py-40'} ${isWhiteBackground ? 'bg-white' : 'bg-nexus-dark/50 backdrop-blur-sm'}`}>
+          <div className="w-full px-4 md:px-12 relative z-10">
             <div className="max-w-[90rem] mx-auto w-full">
-              <h2 className={`font-tesla font-bold text-3xl md:text-5xl ${isWhiteBackground ? 'text-black' : 'text-white'} uppercase mb-12 tracking-tight ${centerFeatures ? 'text-center' : ''}`} style={{ fontFamily: 'Barlow' }}>
+              <h2 className={`font-tesla font-bold text-2xl md:text-5xl ${isWhiteBackground ? 'text-black' : 'text-white'} uppercase mb-8 md:mb-12 tracking-tight ${centerFeatures ? 'text-center' : ''}`} style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 5vw, 3rem)' }}>
                 {t('servicePage.features')}
               </h2>
               
@@ -317,10 +317,10 @@ const ServicePage: React.FC<ServicePageProps> = ({
                         )}
                         {/* Content */}
                         <div className={`w-full md:w-1/2 ${centerFeatures ? 'text-center' : ''}`}>
-                          <h3 className={`font-tesla font-bold text-2xl md:text-3xl ${isWhiteBackground ? 'text-black' : 'text-white'} mb-4 md:mb-6 tracking-wide`} style={{ fontFamily: 'Barlow' }}>
+                          <h3 className={`font-tesla font-bold text-xl md:text-3xl ${isWhiteBackground ? 'text-black' : 'text-white'} mb-3 md:mb-6 tracking-wide`} style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.25rem, 4vw, 1.875rem)' }}>
                             {t(`${key}.title`)}
                           </h3>
-                          <p className={`${isWhiteBackground ? 'text-black/70' : 'text-white/70'} text-base md:text-lg font-light leading-relaxed ${centerFeatures ? 'max-w-2xl mx-auto' : ''}`}>
+                          <p className={`${isWhiteBackground ? 'text-black/70' : 'text-white/70'} text-base md:text-lg font-light leading-relaxed ${centerFeatures ? 'max-w-2xl mx-auto' : ''}`} style={{ fontSize: '16px' }}>
                             {t(`${key}.desc`)}
                           </p>
                         </div>
@@ -332,10 +332,10 @@ const ServicePage: React.FC<ServicePageProps> = ({
                 <div className="space-y-12">
                   {/* First Feature with Images */}
                   <div className="text-center">
-                    <h3 className={`font-tesla font-bold text-xl md:text-2xl ${isWhiteBackground ? 'text-black' : 'text-white'} mb-6 tracking-wide`} style={{ fontFamily: 'Barlow' }}>
+                      <h3 className={`font-tesla font-bold text-xl md:text-2xl ${isWhiteBackground ? 'text-black' : 'text-white'} mb-4 md:mb-6 tracking-wide`} style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>
                       {t(`${featuresKey[0]}.title`)}
                     </h3>
-                    <p className={`${isWhiteBackground ? 'text-black/70' : 'text-white/70'} text-sm md:text-base font-light leading-relaxed mb-8 max-w-3xl mx-auto`}>
+                    <p className={`${isWhiteBackground ? 'text-black/70' : 'text-white/70'} text-base md:text-base font-light leading-relaxed mb-6 md:mb-8 max-w-3xl mx-auto`} style={{ fontSize: '16px' }}>
                       {t(`${featuresKey[0]}.desc`)}
                     </p>
                     {/* Images Grid */}
@@ -416,22 +416,23 @@ const ServicePage: React.FC<ServicePageProps> = ({
         </section>
 
         {/* CTA Section */}
-        <section className={`relative ${hideCTATitle ? 'py-12 md:py-16' : 'py-24'} ${isWhiteBackground ? 'bg-gray-50' : 'bg-nexus-dark/50 backdrop-blur-sm'}`}>
-          <div className="w-full px-6 md:px-12 relative z-10">
+        <section className={`relative ${hideCTATitle ? 'py-12 md:py-16' : 'py-16 md:py-24'} ${isWhiteBackground ? 'bg-gray-50' : 'bg-nexus-dark/50 backdrop-blur-sm'}`}>
+          <div className="w-full px-4 md:px-12 relative z-10">
             <div className="max-w-[90rem] mx-auto w-full text-center">
               {!hideCTATitle && (
                 <>
-                  <h2 className={`font-tesla font-bold text-3xl md:text-5xl ${isWhiteBackground ? 'text-black' : 'text-white'} uppercase mb-6 tracking-tight`} style={{ fontFamily: 'Barlow' }}>
+                  <h2 className={`font-tesla font-bold text-2xl md:text-5xl ${isWhiteBackground ? 'text-black' : 'text-white'} uppercase mb-4 md:mb-6 tracking-tight`} style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 5vw, 3rem)' }}>
                     {t('servicePage.ctaTitle')}
                   </h2>
-                  <p className={`${isWhiteBackground ? 'text-black/70' : 'text-white/70'} text-base md:text-lg mb-8 max-w-2xl mx-auto`}>
+                  <p className={`${isWhiteBackground ? 'text-black/70' : 'text-white/70'} text-base md:text-lg mb-6 md:mb-8 max-w-2xl mx-auto`} style={{ fontSize: '16px' }}>
                     {t('servicePage.ctaDesc')}
                   </p>
                 </>
               )}
               <button
                 onClick={() => setIsContactOpen(true)}
-                className={`px-10 md:px-12 py-3 md:py-3.5 bg-transparent ${isWhiteBackground ? 'text-black border border-black/60 hover:bg-black hover:text-white' : 'text-white border border-white/60 hover:bg-white hover:text-black'} transition-all duration-300 rounded-lg font-display font-bold uppercase tracking-widest text-xs md:text-sm`}
+                className={`px-8 md:px-12 py-3.5 md:py-3.5 bg-transparent ${isWhiteBackground ? 'text-black border border-black/60 hover:bg-black hover:text-white active:bg-black/90' : 'text-white border border-white/60 hover:bg-white hover:text-black active:bg-white/90'} transition-all duration-300 rounded-lg font-display font-bold uppercase tracking-widest touch-manipulation`}
+                style={{ minHeight: '44px', fontSize: '16px' }}
               >
                 {t('services.button')}
               </button>
@@ -453,9 +454,10 @@ const ServicePage: React.FC<ServicePageProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-3 right-3 text-white/40 hover:text-white text-sm"
+              className="absolute top-4 right-4 text-white/40 hover:text-white active:text-white text-lg touch-manipulation"
               onClick={() => setIsContactOpen(false)}
               aria-label="Close contact details"
+              style={{ minHeight: '44px', minWidth: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               ✕
             </button>
