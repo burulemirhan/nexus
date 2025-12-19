@@ -21,9 +21,9 @@ interface Branch {
   startY: number;
   endX: number;
   endY: number;
+  waypoints: Array<{ x: number; y: number; angle: number }>; // Waypoints for snake-like growth
+  currentSegment: number; // Current segment being grown
   nodes: Array<{ x: number; y: number; size: number }>; // Intersection nodes along this branch
-  segments: Array<{ x: number; y: number }>; // Snake-like path segments
-  currentAngle: number; // Current direction for snake-like growth
 }
 
 interface Node {
@@ -77,18 +77,41 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
     };
   };
 
-  // Generate complex network of branches in all directions
+  // Generate complex network of branches in all directions with snake-like waypoints
   const generateBranches = (count: number, seed: number, centerX: number, centerY: number): Branch[] => {
     const random = seededRandom(seed);
     const branches: Branch[] = [];
     
     // Primary branches in many directions
     for (let i = 0; i < count; i++) {
-      const initialAngle = (i / count) * Math.PI * 2 + (random() - 0.5) * 0.5;
-      const maxLength = 100 + random() * 120; // 100-220px - varied lengths
+      const baseAngle = (i / count) * Math.PI * 2 + (random() - 0.5) * 0.5;
+      const maxLength = 120 + random() * 140; // 120-260px - varied lengths
+      
+      // Create waypoints for snake-like growth (3-5 segments)
+      const segmentCount = 3 + Math.floor(random() * 3); // 3-5 segments
+      const segmentLength = maxLength / segmentCount;
+      const waypoints: Array<{ x: number; y: number; angle: number }> = [];
+      
+      let currentX = centerX;
+      let currentY = centerY;
+      let currentAngle = baseAngle;
+      
+      // Generate waypoints with changing directions
+      for (let seg = 0; seg < segmentCount; seg++) {
+        // Change direction for each segment (snake-like movement)
+        currentAngle += (random() - 0.5) * 0.8; // Vary angle by ±0.4 radians (~23°)
+        currentX += Math.cos(currentAngle) * segmentLength;
+        currentY += Math.sin(currentAngle) * segmentLength;
+        
+        waypoints.push({
+          x: currentX,
+          y: currentY,
+          angle: currentAngle,
+        });
+      }
       
       branches.push({
-        angle: initialAngle,
+        angle: baseAngle,
         length: 0,
         maxLength,
         progress: 0,
@@ -98,9 +121,9 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         startY: centerY,
         endX: centerX,
         endY: centerY,
+        waypoints,
+        currentSegment: 0,
         nodes: [],
-        segments: [{ x: centerX, y: centerY }], // Start with center point
-        currentAngle: initialAngle,
       });
     }
     
@@ -246,12 +269,11 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
       };
     }
 
-    // Full animation - snake-like growth with direction changes
+    // Full animation - slower and more complex
     const branchCount = 28; // Many more branches for complex network
     let branches = generateBranches(branchCount, 42, width / 2, height / 2); // Seed: 42
-    const cycleDuration = 3000; // 3 seconds per cycle
-    const growthPhase = 0.7; // First 70% is growth (slower growth), rest is fade
-    const segmentLength = 15; // Length of each snake segment
+    const cycleDuration = 6000; // 6 seconds per cycle (even slower)
+    const growthPhase = 0.65; // First 65% is growth, rest is fade
 
     const animate = () => {
       const elapsed = Date.now() - cycleStartTimeRef.current;
@@ -271,66 +293,82 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
       const centerX = width / 2;
       const centerY = height / 2;
 
-      // Easing functions for smooth motion - slower easing for snake-like growth
-      const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4); // Slower easing
+      // Easing functions for smooth motion
+      const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
       const easeInOutCubic = (t: number) => t < 0.5 
         ? 4 * t * t * t 
         : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
       if (isGrowing) {
-        const easedProgress = easeOutQuart(phaseProgress); // Slower easing for gradual growth
+        // Use easeOutQuad for slower, more organic growth
+        const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
+        const easedProgress = easeOutQuad(phaseProgress);
         
-        // Update branches with snake-like path generation
-        branches.forEach((branch, branchIndex) => {
+        // Update branches with snake-like growth through waypoints
+        branches.forEach((branch) => {
           branch.progress = easedProgress;
-          const targetLength = branch.maxLength * easedProgress;
+          branch.length = branch.maxLength * easedProgress;
           
-          // Generate snake-like path with direction changes
-          const segmentCount = Math.floor(targetLength / segmentLength);
-          const random = seededRandom(42 + branchIndex); // Unique seed per branch
+          // Calculate total distance traveled
+          const totalDistance = branch.maxLength * easedProgress;
+          const segmentLength = branch.maxLength / branch.waypoints.length;
           
-          // Build snake path segment by segment
-          branch.segments = [{ x: centerX, y: centerY }];
-          let currentX = centerX;
-          let currentY = centerY;
-          let currentAngle = branch.angle;
-          let accumulatedLength = 0;
+          // Determine which segment we're in and how far along that segment
+          let accumulatedDistance = 0;
+          let currentSegmentIndex = 0;
           
-          for (let i = 0; i < segmentCount && accumulatedLength < targetLength; i++) {
-            // Change direction slightly for each segment (snake-like)
-            const angleChange = (random() - 0.5) * 0.8; // Change direction up to ±0.4 rad (~23°)
-            currentAngle += angleChange;
+          for (let i = 0; i < branch.waypoints.length; i++) {
+            const segmentDist = Math.hypot(
+              branch.waypoints[i].x - (i === 0 ? centerX : branch.waypoints[i - 1].x),
+              branch.waypoints[i].y - (i === 0 ? centerY : branch.waypoints[i - 1].y)
+            );
             
-            // Calculate segment end
-            const segLength = Math.min(segmentLength, targetLength - accumulatedLength);
-            const nextX = currentX + Math.cos(currentAngle) * segLength;
-            const nextY = currentY + Math.sin(currentAngle) * segLength;
-            
-            branch.segments.push({ x: nextX, y: nextY });
-            currentX = nextX;
-            currentY = nextY;
-            accumulatedLength += segLength;
+            if (accumulatedDistance + segmentDist >= totalDistance) {
+              currentSegmentIndex = i;
+              break;
+            }
+            accumulatedDistance += segmentDist;
+            currentSegmentIndex = i + 1;
           }
           
-          // Set end position
-          if (branch.segments.length > 1) {
-            const lastSegment = branch.segments[branch.segments.length - 1];
-            branch.endX = lastSegment.x;
-            branch.endY = lastSegment.y;
+          branch.currentSegment = Math.min(currentSegmentIndex, branch.waypoints.length - 1);
+          
+          // Calculate current end position based on waypoints
+          if (currentSegmentIndex === 0) {
+            // Still in first segment
+            const progressInSegment = totalDistance / segmentLength;
+            const startX = centerX;
+            const startY = centerY;
+            const targetX = branch.waypoints[0].x;
+            const targetY = branch.waypoints[0].y;
+            branch.endX = startX + (targetX - startX) * Math.min(progressInSegment, 1);
+            branch.endY = startY + (targetY - startY) * Math.min(progressInSegment, 1);
+          } else if (currentSegmentIndex >= branch.waypoints.length) {
+            // Past all waypoints - use final waypoint
+            branch.endX = branch.waypoints[branch.waypoints.length - 1].x;
+            branch.endY = branch.waypoints[branch.waypoints.length - 1].y;
           } else {
-            branch.endX = centerX;
-            branch.endY = centerY;
+            // In middle segment
+            const prevWaypoint = branch.waypoints[currentSegmentIndex - 1];
+            const currentWaypoint = branch.waypoints[currentSegmentIndex];
+            const prevDist = accumulatedDistance;
+            const segmentDist = Math.hypot(
+              currentWaypoint.x - prevWaypoint.x,
+              currentWaypoint.y - prevWaypoint.y
+            );
+            const progressInSegment = (totalDistance - prevDist) / segmentDist;
+            
+            branch.endX = prevWaypoint.x + (currentWaypoint.x - prevWaypoint.x) * Math.min(progressInSegment, 1);
+            branch.endY = prevWaypoint.y + (currentWaypoint.y - prevWaypoint.y) * Math.min(progressInSegment, 1);
           }
           
           branch.startX = centerX;
           branch.startY = centerY;
-          branch.length = targetLength;
-          branch.currentAngle = currentAngle;
           
           // Dot appears when branch is 70% grown
           if (easedProgress > 0.7) {
             branch.dotProgress = Math.min(1, (easedProgress - 0.7) / 0.3);
-            branch.endDotSize = 2.5 * easeOutQuart(branch.dotProgress);
+            branch.endDotSize = 2.5 * easeOutQuad(branch.dotProgress);
           }
         });
       } else {
@@ -353,9 +391,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
 
         if (opacity <= 0) return;
 
-        // Draw snake-like path using segments
-        if (branch.segments.length < 2) return;
-
+        // Draw snake-like branch through waypoints
         ctx.save();
         ctx.globalAlpha = opacity * 0.9;
         ctx.strokeStyle = '#ffffff'; // White arms
@@ -365,36 +401,22 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         ctx.shadowBlur = 3;
         ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.3})`; // Soft white glow
 
-        // Draw path through all segments
         ctx.beginPath();
-        ctx.moveTo(branch.segments[0].x, branch.segments[0].y);
+        ctx.moveTo(branch.startX, branch.startY);
         
-        // Draw smooth curve through segments
-        for (let i = 1; i < branch.segments.length; i++) {
-          const prev = branch.segments[i - 1];
-          const curr = branch.segments[i];
-          
-          if (i === 1) {
-            // First segment - straight line
-            ctx.lineTo(curr.x, curr.y);
+        // Draw through waypoints up to current position
+        for (let i = 0; i <= branch.currentSegment && i < branch.waypoints.length; i++) {
+          const waypoint = branch.waypoints[i];
+          if (i === branch.currentSegment) {
+            // Draw to current end position (partial segment)
+            ctx.lineTo(branch.endX, branch.endY);
           } else {
-            // Subsequent segments - smooth curve
-            const next = branch.segments[i + 1] || curr;
-            const cp1x = prev.x + (curr.x - prev.x) * 0.5;
-            const cp1y = prev.y + (curr.y - prev.y) * 0.5;
-            const cp2x = curr.x - (next.x - curr.x) * 0.5;
-            const cp2y = curr.y - (next.y - curr.y) * 0.5;
-            
-            if (i === branch.segments.length - 1) {
-              ctx.lineTo(curr.x, curr.y);
-            } else {
-              ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, curr.x, curr.y);
-            }
+            // Draw to complete waypoint
+            ctx.lineTo(waypoint.x, waypoint.y);
           }
         }
         
         ctx.stroke();
-        
         ctx.shadowBlur = 0;
         ctx.restore();
 
@@ -403,10 +425,6 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
           ctx.save();
           const dotOpacity = opacity * branch.dotProgress;
           ctx.globalAlpha = dotOpacity;
-
-          // Use end position from branch
-          const endX = branch.endX;
-          const endY = branch.endY;
 
           // Dot halo - white
           const dotGradient = ctx.createRadialGradient(
