@@ -156,7 +156,7 @@ const DefenseSpace: React.FC = () => {
                  {/* Background video fills box */}
                  <video
                    className="absolute inset-0 w-full h-full object-cover opacity-90"
-                   src="/moon.mp4"
+                   src="/assets/videos/moon.mp4"
                    autoPlay
                    muted
                    loop

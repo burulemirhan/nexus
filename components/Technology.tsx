@@ -119,7 +119,7 @@ const Technology: React.FC = () => {
                  {/* Image Content */}
                  <div className="relative w-full h-full animate-in zoom-in-95 fade-in duration-1000" key={`img-${activeTech.id}`}>
                     <img 
-                        src={`/${activeTech.id}.png`} 
+                        src={`/assets/images/${activeTech.id}.png`} 
                         alt={`${activeTech.name} - ${activeTech.subtitle}`}
                         loading="lazy"
                         decoding="async"

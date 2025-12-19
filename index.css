@@ -3,7 +3,7 @@
 /* Font display optimization */
 @font-face {
   font-family: 'Tesla';
-  src: url('/TESLA.ttf') format('truetype');
+  src: url('/assets/fonts/TESLA.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

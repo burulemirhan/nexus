@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -13,26 +13,13 @@ import Lenis from 'lenis';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const location = useLocation();
 
   // Update HTML lang attribute based on route
   useEffect(() => {
-    const htmlLang = location.pathname === '/en' ? 'en' : 'tr';
+    const htmlLang = location.pathname.startsWith('/en') ? 'en' : 'tr';
     document.documentElement.lang = htmlLang;
   }, [location.pathname]);
-
-  // Lazy load video after initial render
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.src = 'bg.mp4';
-        videoRef.current.load();
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     // Initialize Lenis for smooth scrolling
@@ -83,26 +70,19 @@ const App: React.FC = () => {
       {/* Global Background Video (Vertical Farming Theme) */}
       <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark" aria-hidden="true">
         <div className="absolute inset-0 w-full h-full">
-          {/* Poster image shown immediately */}
-          <img 
-            src="bg.png" 
-            alt="" 
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${videoLoaded ? 'opacity-0' : 'opacity-100'}`}
-            aria-hidden="true"
-          />
-          {/* Video loads after initial render */}
           <video 
-            ref={videoRef}
             autoPlay 
             loop 
             muted 
             playsInline
-            preload="none"
-            className={`w-full h-full object-cover -z-50 transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-            poster="bg.png"
-            onLoadedData={() => setVideoLoaded(true)}
+            preload="auto"
+            className="w-full h-full object-cover -z-50"
             aria-hidden="true"
-          />
+          >
+            <source src="/assets/videos/bg.mp4" type="video/mp4" />
+            {/* Fallback stock video of vertical farming/technology */}
+            <source src="https://videos.pexels.com/video-files/5427845/5427845-uhd_2560_1440_24fps.mp4" type="video/mp4" />
+          </video>
         </div>
 
         {/* Heavy Overlay for Dark Theme */}

@@ -21,7 +21,7 @@ const ConsultingProjectManagement: React.FC = () => {
       featuresKey={featuresKey}
       processKey={processKey}
       customBackground="white"
-      heroBackgroundImage="/bg5.png"
+      heroBackgroundImage="/assets/images/bg5.png"
     />
   );
 };

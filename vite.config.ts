@@ -4,7 +4,14 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    
+    // For GitHub Pages: if deploying to a repository subdirectory, set base to '/repo-name/'
+    // For root domain deployment, use '/'
+    // You can override this with environment variable: VITE_BASE_PATH=/your-repo-name/
+    const base = process.env.VITE_BASE_PATH || '/';
+    
     return {
+      base: base,
       server: {
         port: 3000,
         host: '0.0.0.0',
@@ -20,6 +27,8 @@ export default defineConfig(({ mode }) => {
         }
       },
       build: {
+        // Output directory
+        outDir: 'dist',
         // Optimize chunk size
         rollupOptions: {
           output: {

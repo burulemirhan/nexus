@@ -14,9 +14,13 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
+
+// Get base path from environment or use default
+const basePath = import.meta.env.BASE_URL || '/';
+
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={basePath}>
       <Routes>
         <Route path="/" element={
           <LanguageProvider defaultLanguage="tr">

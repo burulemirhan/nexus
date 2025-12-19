@@ -30,7 +30,9 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, de
 
   useEffect(() => {
     // Update language based on route
-    if (location.pathname === '/en') {
+    // Any path starting with '/en' is treated as English,
+    // everything else is treated as Turkish.
+    if (location.pathname.startsWith('/en')) {
       setLanguageState('en');
       localStorage.setItem('nexus-language', 'en');
     } else {

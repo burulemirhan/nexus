@@ -21,7 +21,7 @@ const TurnkeyProjects: React.FC = () => {
       featuresKey={featuresKey}
       processKey={processKey}
       customBackground="white"
-      heroBackgroundImage="/bg3.png"
+      heroBackgroundImage="/assets/images/bg3.png"
     />
   );
 };
