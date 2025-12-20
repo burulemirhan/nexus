@@ -103,7 +103,7 @@ const Services: React.FC = () => {
             <h3 className="font-tesla font-bold text-xl md:text-2xl mb-4 tracking-wide" style={{ fontFamily: 'Barlow' }}>
               {t('services.button')}
             </h3>
-            <div className="space-y-3 text-sm md:text-base font-mono">
+            <div className="space-y-3 font-mono" style={{ fontSize: '0.85rem' }}>
               <div>
                 <span className="text-white/40 mr-2">E-mail:</span>
                 <a href="mailto:emirhanburul@nexusbiotech.org" className="text-white hover:underline">
