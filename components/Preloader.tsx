@@ -5,51 +5,113 @@ interface PreloaderProps {
   minDuration?: number; // Minimum duration in milliseconds
 }
 
-// Emerald green color palette
-const EMERALD_PRIMARY = '#10b981'; // Emerald-500
-const EMERALD_GLOW = '#34d399'; // Emerald-400 for glow
-const EMERALD_DARK = '#059669'; // Emerald-600 for subtle variation
-
-interface Node {
-  distance: number; // Distance along branch from center (0-1)
-  glowProgress: number; // 0-1 for glow animation when created
-  age: number; // Time since creation
-}
-
-interface Branch {
+class Branch {
+  startX: number;
+  startY: number;
   angle: number;
   length: number;
   maxLength: number;
-  curve: number; // Base curvature factor
-  wavePhase: number; // Phase for sine wave undulation
-  waveAmplitude: number; // Amplitude of snake-like movement
-  waveFrequency: number; // Frequency of undulation
-  progress: number;
-  nodes: Node[]; // Nodes along the branch
-  endDotSize: number;
+  thickness: number;
+  speed: number;
+  isFinished: boolean;
+  generation: number;
+  hasBranched: boolean;
+
+  constructor(x: number, y: number, angle: number, length: number, thickness: number, generation: number) {
+    this.startX = x;
+    this.startY = y;
+    this.angle = angle;
+    this.length = 0;
+    this.maxLength = length;
+    this.thickness = thickness;
+    // Slower, more elegant speed
+    this.speed = 1.0 + (5 - generation) * 0.2; 
+    this.isFinished = false;
+    this.generation = generation;
+    this.hasBranched = false;
+  }
+
+  update() {
+    if (this.length < this.maxLength) {
+      this.length += this.speed;
+      // Clamp length to maxLength
+      if (this.length > this.maxLength) this.length = this.maxLength;
+      return true;
+    } else {
+      this.isFinished = true;
+      return false;
+    }
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    const endX = this.startX + Math.cos(this.angle) * this.length;
+    const endY = this.startY + Math.sin(this.angle) * this.length;
+
+    // Draw the line segment
+    ctx.beginPath();
+    ctx.moveTo(this.startX, this.startY);
+    ctx.lineTo(endX, endY);
+    ctx.lineWidth = Math.max(0.5, this.thickness);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Glowing tip effect while growing
+    if (!this.isFinished) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(endX, endY, this.thickness * 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      // Strong glow at the tip
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = '#ffffff';
+      ctx.fill();
+      
+      // Secondary inner glow for extra "tip" brightness
+      ctx.beginPath();
+      ctx.arc(endX, endY, this.thickness * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowBlur = 5;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  createSymmetricalChildren(): Branch[] {
+    // Limit to 5 generations for clarity and aesthetics
+    if (this.generation >= 5 || this.hasBranched) return [];
+    this.hasBranched = true;
+    
+    const endX = this.startX + Math.cos(this.angle) * this.maxLength;
+    const endY = this.startY + Math.sin(this.angle) * this.maxLength;
+    
+    // Spread angle decreases slightly each generation for a more organic tree-like structure
+    const baseSpread = Math.PI / 5; // ~36 degrees
+    const spread = baseSpread * (1 - (this.generation * 0.1)); 
+    
+    const leftAngle = this.angle - spread;
+    const rightAngle = this.angle + spread;
+    
+    // Length also scales down
+    const newLen = this.maxLength * 0.8;
+    const newThickness = this.thickness * 0.7;
+
+    return [
+      new Branch(endX, endY, leftAngle, newLen, newThickness, this.generation + 1),
+      new Branch(endX, endY, rightAngle, newLen, newThickness, this.generation + 1)
+    ];
+  }
 }
 
 const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
+  const branchesRef = useRef<Branch[]>([]);
+  const finishedRef = useRef(false);
   const startTimeRef = useRef<number>(Date.now());
-  const cycleStartTimeRef = useRef<number>(Date.now());
   const [isVisible, setIsVisible] = useState(true);
   const [pageReady, setPageReady] = useState(false);
-  const reducedMotion = useRef(false);
-
-  // Check for reduced motion preference
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    reducedMotion.current = mediaQuery.matches;
-    
-    const handleChange = (e: MediaQueryListEvent) => {
-      reducedMotion.current = e.matches;
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  const animationFrameIdRef = useRef<number | null>(null);
+  const frameCountRef = useRef<number>(0);
 
   // Check if page is ready
   useEffect(() => {
@@ -64,433 +126,102 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
     checkPageReady();
   }, []);
 
-  // Deterministic random number generator (seeded)
-  const seededRandom = (seed: number) => {
-    let value = seed;
-    return () => {
-      value = (value * 9301 + 49297) % 233280;
-      return value / 233280;
-    };
-  };
-
-  // Generate deterministic branches with snake-like properties
-  const generateBranches = (count: number, seed: number): Branch[] => {
-    const random = seededRandom(seed);
-    const branches: Branch[] = [];
-    
-    for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2 + (random() - 0.5) * 0.3;
-      const maxLength = 150 + random() * 100; // 150-250px
-      const curve = (random() - 0.5) * 0.6; // More pronounced base curve
-      const wavePhase = random() * Math.PI * 2; // Random phase for each branch
-      const waveAmplitude = 15 + random() * 20; // 15-35px amplitude for snake movement
-      const waveFrequency = 0.02 + random() * 0.03; // Frequency of undulation
-      
-      branches.push({
-        angle,
-        length: 0,
-        maxLength,
-        curve,
-        wavePhase,
-        waveAmplitude,
-        waveFrequency,
-        progress: 0,
-        nodes: [],
-        endDotSize: 0,
-      });
-    }
-    
-    return branches;
-  };
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    // alpha: false for better performance and clear black rendering
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    // Set canvas size - ensure proper dimensions for mobile
-    const resizeCanvas = () => {
+    const handleResize = () => {
       const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       
-      // Set actual canvas size in physical pixels
       canvas.width = width * dpr;
       canvas.height = height * dpr;
-      
-      // Scale context to match device pixel ratio for crisp rendering
       ctx.scale(dpr, dpr);
       
-      // Set display size in CSS pixels
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
     };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    const rootX = window.innerWidth / 2;
+    const rootY = window.innerHeight * 0.65; // Start slightly below center
     
-    resizeCanvas();
-    const resizeHandler = () => {
-      resizeCanvas();
-      // Ensure animation continues after resize
-      if (!animationFrameRef.current) {
-        cycleStartTimeRef.current = Date.now();
-      }
-    };
-    window.addEventListener('resize', resizeHandler);
-
-    // Reduced motion: simple pulse
-    if (reducedMotion.current) {
-      const animateReduced = () => {
-        const elapsed = Date.now() - cycleStartTimeRef.current;
-        const cycleDuration = 2000;
-        const t = (elapsed % cycleDuration) / cycleDuration;
-        
-        const rect = canvas.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        
-        // Clear using logical pixels (ctx is already scaled)
-        ctx.clearRect(0, 0, width, height);
-        
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const pulseSize = 4 + Math.sin(t * Math.PI * 2) * 0.5;
-        const opacity = 0.6 + Math.sin(t * Math.PI * 2) * 0.2;
-        
-        // Central dot with gentle pulse
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, pulseSize, 0, Math.PI * 2);
-        ctx.fillStyle = EMERALD_PRIMARY;
-        ctx.globalAlpha = opacity;
-        ctx.fill();
-        
-        // Halo
-        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseSize * 3);
-        gradient.addColorStop(0, `rgba(16, 185, 129, ${opacity * 0.3})`);
-        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, pulseSize * 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.globalAlpha = 1;
-        animationFrameRef.current = requestAnimationFrame(animateReduced);
-      };
-      
-      animateReduced();
-      return () => {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-        window.removeEventListener('resize', resizeHandler);
-      };
-    }
-
-    // Full animation - slower for more organic feel
-    const branchCount = 18; // More arms for richer network
-    let branches = generateBranches(branchCount, 42); // Seed: 42
-    const cycleDuration = 12000; // 12 seconds per cycle (half speed for very slow, natural growth)
-    const growthPhase = 0.65; // First 65% is growth, rest is fade
-    const nodeSpacing = 0.15; // Create a node every 15% of branch length
+    // Initial root branch growing straight up
+    const startAngle = -Math.PI / 2;
+    const initialBranch = new Branch(rootX, rootY, startAngle, 100, 3, 0);
+    branchesRef.current = [initialBranch];
 
     const animate = () => {
-      const elapsed = Date.now() - cycleStartTimeRef.current;
-      const cycleProgress = (elapsed % cycleDuration) / cycleDuration;
-      const isGrowing = cycleProgress < growthPhase;
-      const phaseProgress = isGrowing 
-        ? cycleProgress / growthPhase 
-        : (cycleProgress - growthPhase) / (1 - growthPhase);
-
-      const rect = canvas.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
+      frameCountRef.current++;
       
-      // Clear using logical pixels (ctx is already scaled)
-      ctx.clearRect(0, 0, width, height);
-      
-      const centerX = width / 2;
-      const centerY = height / 2;
+      // Clear with solid black - no transparency to avoid flickering/ghosting
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // Easing functions - smoother, more organic
-      const easeOutSine = (t: number) => Math.sin(t * Math.PI / 2);
-      const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
+      // Starting origin pulse
+      const originPulse = Math.sin(frameCountRef.current * 0.04) * 1.5 + 4;
+      ctx.beginPath();
+      ctx.arc(rootX, rootY, originPulse, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fill();
 
-      if (isGrowing) {
-        const easedProgress = easeOutSine(phaseProgress); // Slower, more natural easing
+      let stillGrowing = false;
+      const currentBranches = branchesRef.current;
+      const newBranchesToAdd: Branch[] = [];
+
+      // Update and Draw
+      for (let i = 0; i < currentBranches.length; i++) {
+        const branch = currentBranches[i];
+        const growing = branch.update();
+        if (growing) stillGrowing = true;
         
-        // Update branches
-        branches.forEach((branch) => {
-          branch.progress = easedProgress;
-          branch.length = branch.maxLength * easedProgress;
-          
-          // Create nodes along the branch as it grows
-          const currentNodeDistance = easedProgress;
-          const shouldHaveNodes = Math.floor(currentNodeDistance / nodeSpacing);
-          
-          // Add new nodes when branch reaches node positions
-          for (let i = 1; i <= shouldHaveNodes; i++) {
-            const nodeDistance = i * nodeSpacing;
-            if (nodeDistance <= easedProgress) {
-              // Check if node already exists
-              const existingNode = branch.nodes.find(n => 
-                Math.abs(n.distance - nodeDistance) < 0.01
-              );
-              
-              if (!existingNode) {
-                // Create new node with glow animation
-                branch.nodes.push({
-                  distance: nodeDistance,
-                  glowProgress: 0, // Start at 0 for glow effect
-                  age: 0,
-                });
-              }
-            }
-          }
-          
-          // Update node glow animations
-          branch.nodes.forEach((node) => {
-            node.age += 0.016; // Roughly 60fps
-            // Glow peaks quickly then fades
-            if (node.age < 0.3) {
-              node.glowProgress = Math.sin((node.age / 0.3) * Math.PI);
-            } else {
-              node.glowProgress = Math.max(0.3, 1 - (node.age - 0.3) * 0.5);
-            }
-          });
-          
-          // End dot appears when branch is fully grown
-          if (easedProgress > 0.95) {
-            branch.endDotSize = 3 * Math.min(1, (easedProgress - 0.95) / 0.05);
-          }
-        });
-      } else {
-        // Fade phase - keep branch lengths at max, but fade opacity
-        branches.forEach((branch) => {
-          branch.length = branch.maxLength;
-          branch.progress = 1 - easeInOutSine(phaseProgress);
-          branch.endDotSize = 3 * branch.progress;
-          
-          // Fade nodes
-          branch.nodes.forEach((node) => {
-            node.glowProgress *= branch.progress;
-          });
-        });
-      }
+        branch.draw(ctx);
 
-      // Draw branches and dots
-      branches.forEach((branch) => {
-        if (branch.progress <= 0) return;
-
-        const opacity = isGrowing 
-          ? Math.min(1, branch.progress * 1.5)
-          : branch.progress;
-
-        if (opacity <= 0) return;
-
-        // Calculate snake-like path with multiple curves
-        const startX = centerX;
-        const startY = centerY;
-        const baseEndX = startX + Math.cos(branch.angle) * branch.length;
-        const baseEndY = startY + Math.sin(branch.angle) * branch.length;
-        
-        // Create sinuous path using multiple points for snake-like movement
-        const pathPoints: { x: number; y: number }[] = [];
-        const numPoints = Math.max(20, Math.floor(branch.maxLength / 8)); // More points for smoother curves
-        
-        for (let i = 0; i <= numPoints; i++) {
-          const t = i / numPoints; // 0 to 1 along branch
-          const currentLength = branch.length * t;
-          
-          // Base direction
-          const baseX = startX + Math.cos(branch.angle) * currentLength;
-          const baseY = startY + Math.sin(branch.angle) * currentLength;
-          
-          // Add base curve (smooth arc)
-          const perpAngle = branch.angle + Math.PI / 2;
-          const curveOffset = branch.curve * currentLength * 0.4;
-          const curvedX = baseX + Math.cos(perpAngle) * curveOffset;
-          const curvedY = baseY + Math.sin(perpAngle) * curveOffset;
-          
-          // Add snake-like undulation (sine wave perpendicular to path)
-          const wavePhase = branch.wavePhase + (currentLength * branch.waveFrequency);
-          const waveOffset = Math.sin(wavePhase) * branch.waveAmplitude * t; // Amplitude grows with distance
-          const finalX = curvedX + Math.cos(perpAngle) * waveOffset;
-          const finalY = curvedY + Math.sin(perpAngle) * waveOffset;
-          
-          pathPoints.push({ x: finalX, y: finalY });
-        }
-
-        // Draw snake-like branch - white arms
-        ctx.save();
-        ctx.globalAlpha = opacity * 0.9;
-        ctx.strokeStyle = '#ffffff'; // White arms
-        ctx.lineWidth = 1.5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.shadowBlur = 3;
-        ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.3})`; // Soft white glow
-
-        // Draw smooth path through points
-        ctx.beginPath();
-        ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
-        
-        for (let i = 1; i < pathPoints.length; i++) {
-          const prev = pathPoints[i - 1];
-          const curr = pathPoints[i];
-          
-          if (i === 1) {
-            ctx.lineTo(curr.x, curr.y);
-          } else {
-            const prev2 = pathPoints[i - 2];
-            // Smooth curve using quadratic bezier
-            const cpX = prev.x;
-            const cpY = prev.y;
-            ctx.quadraticCurveTo(cpX, cpY, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+        // If finished growing, spawn children immediately to keep the motion fluid
+        if (!growing && branch.isFinished && !branch.hasBranched) {
+          const children = branch.createSymmetricalChildren();
+          if (children.length > 0) {
+            newBranchesToAdd.push(...children);
+            stillGrowing = true;
           }
         }
-        ctx.stroke();
-        
-        ctx.shadowBlur = 0;
-        ctx.restore();
-        
-        // Draw nodes along the path with glow
-        branch.nodes.forEach((node) => {
-          if (node.distance > branch.progress) return; // Only show nodes that have been reached
-          
-          const nodeT = node.distance / branch.progress;
-          const nodeIndex = Math.floor(nodeT * (pathPoints.length - 1));
-          const nodePoint = pathPoints[Math.min(nodeIndex, pathPoints.length - 1)];
-          
-          ctx.save();
-          const nodeOpacity = opacity * node.glowProgress;
-          ctx.globalAlpha = nodeOpacity;
-          
-          // Node glow - brighter when just created
-          const glowSize = 4 + node.glowProgress * 6; // 4-10px glow
-          const nodeGradient = ctx.createRadialGradient(
-            nodePoint.x, nodePoint.y, 0,
-            nodePoint.x, nodePoint.y, glowSize
-          );
-          nodeGradient.addColorStop(0, `rgba(255, 255, 255, ${node.glowProgress * 0.8})`);
-          nodeGradient.addColorStop(0.5, `rgba(255, 255, 255, ${node.glowProgress * 0.3})`);
-          nodeGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-          
-          ctx.fillStyle = nodeGradient;
-          ctx.beginPath();
-          ctx.arc(nodePoint.x, nodePoint.y, glowSize, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Node core
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(nodePoint.x, nodePoint.y, 1.5 + node.glowProgress * 1, 0, Math.PI * 2);
-          ctx.fill();
-          
-          ctx.restore();
-        });
-
-        // Draw end dot - white (matching the arms) - at the end of the path
-        if (branch.endDotSize > 0 && pathPoints.length > 0) {
-          const endPoint = pathPoints[pathPoints.length - 1];
-          ctx.save();
-          const dotOpacity = opacity;
-          ctx.globalAlpha = dotOpacity;
-
-          // Dot halo - white
-          const dotGradient = ctx.createRadialGradient(
-            endPoint.x, endPoint.y, 0,
-            endPoint.x, endPoint.y, branch.endDotSize * 2.5
-          );
-          dotGradient.addColorStop(0, `rgba(255, 255, 255, ${dotOpacity * 0.4})`);
-          dotGradient.addColorStop(0.6, `rgba(255, 255, 255, ${dotOpacity * 0.15})`);
-          dotGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-          
-          ctx.fillStyle = dotGradient;
-          ctx.beginPath();
-          ctx.arc(endPoint.x, endPoint.y, branch.endDotSize * 2.5, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Dot core - white
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(endPoint.x, endPoint.y, branch.endDotSize, 0, Math.PI * 2);
-          ctx.fill();
-          
-          ctx.restore();
-        }
-      });
-
-      // Draw central dot (always visible during growth, fades during fade phase)
-      const centralDotOpacity = isGrowing ? 1 : Math.max(0.3, 1 - easeInOutCubic(phaseProgress));
-      if (centralDotOpacity > 0) {
-        ctx.save();
-        ctx.globalAlpha = centralDotOpacity;
-
-        // Central dot halo
-        const centerGradient = ctx.createRadialGradient(
-          centerX, centerY, 0,
-          centerX, centerY, 8
-        );
-        centerGradient.addColorStop(0, `rgba(52, 211, 153, ${centralDotOpacity * 0.5})`);
-        centerGradient.addColorStop(0.7, `rgba(16, 185, 129, ${centralDotOpacity * 0.2})`);
-        centerGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        
-        ctx.fillStyle = centerGradient;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Central dot core
-        ctx.fillStyle = EMERALD_PRIMARY;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.restore();
       }
 
-      // Reset cycle if we've faded completely - ensure continuous looping
-      if (!isGrowing && phaseProgress >= 1) {
-        cycleStartTimeRef.current = Date.now();
-        branches = generateBranches(branchCount, 42);
+      if (newBranchesToAdd.length > 0) {
+        branchesRef.current = [...currentBranches, ...newBranchesToAdd];
       }
-      
-      // Clean up old nodes (keep only active ones)
-      branches.forEach((branch) => {
-        branch.nodes = branch.nodes.filter(node => node.distance <= branch.progress);
-      });
 
-      // Always continue animation loop - never stop until component unmounts
-      animationFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      window.removeEventListener('resize', resizeHandler);
-    };
-  }, []);
-
-  // Check if we should dismiss the preloader
-  useEffect(() => {
-    const checkDone = () => {
+      // Check for completion - ensure minDuration and pageReady are met
       const elapsed = Date.now() - startTimeRef.current;
-      if (pageReady && elapsed >= minDuration) {
+      if (!stillGrowing && !finishedRef.current && frameCountRef.current > 120 && pageReady && elapsed >= minDuration) {
+        finishedRef.current = true;
         setIsVisible(false);
         // Small delay for fade-out transition
         setTimeout(() => {
           onDone();
         }, 300);
+        return;
       }
+
+      animationFrameIdRef.current = requestAnimationFrame(animate);
     };
 
-    const interval = setInterval(checkDone, 50); // Check every 50ms
-    return () => clearInterval(interval);
-  }, [pageReady, minDuration, onDone]);
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+      }
+    };
+  }, [onDone, minDuration, pageReady]);
 
   if (!isVisible) return null;
 
