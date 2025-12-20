@@ -135,9 +135,10 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
                navigate(basePath);
                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
              }}
-             className={`font-tesla font-bold text-3xl md:text-[34px] tracking-wider ${darkMode ? 'text-black' : 'text-white drop-shadow-md'} hover:opacity-80 transition-opacity cursor-pointer`}
+             className={`font-tesla font-bold tracking-wider ${darkMode ? 'text-black' : 'text-white drop-shadow-md'} hover:opacity-80 transition-opacity cursor-pointer`}
+             style={{ fontSize: '3.75rem', lineHeight: '1' }}
            >
-             NEXUS
+             E
            </button>
         </div>
 
