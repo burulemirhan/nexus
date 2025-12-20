@@ -82,6 +82,7 @@ const DefenseSpace: React.FC = () => {
     video.playsInline = true;
     video.controls = false;
     video.preload = 'metadata';
+    video.playbackRate = 1.25; // Play moon.mp4 at 1.25x speed
     video.setAttribute('webkit-playsinline', 'true');
     video.setAttribute('playsinline', 'true');
     video.removeAttribute('controls');
