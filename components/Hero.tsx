@@ -34,7 +34,7 @@ const Hero: React.FC = () => {
         <div className="flex items-center gap-4 md:gap-6 pt-2 md:pt-4">
           <a 
             href="#technology" 
-            className="group relative px-6 md:px-8 py-3 md:py-3 border border-white/30 hover:border-white active:border-white transition-all duration-300 rounded-lg touch-manipulation"
+            className="group relative px-6 md:px-8 py-3 md:py-3 border border-white/30 hover:border-white active:border-white transition-[border-color,opacity] duration-300 rounded-lg touch-manipulation"
             aria-label={t('hero.button')}
             style={{ minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
           >

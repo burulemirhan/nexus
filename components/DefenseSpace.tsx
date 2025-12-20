@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
@@ -6,7 +6,9 @@ const BASE_URL = import.meta.env.BASE_URL || '/';
 const DefenseSpace: React.FC = () => {
   const { t } = useLanguage();
   const [animatedDefenseTitle, setAnimatedDefenseTitle] = useState(t('defense.defense'));
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  // Performance: Fixed memory leak - properly clean up all intervals
   // Text scrambling animation for SAVUNMA/DEFENSE title
   useEffect(() => {
     const original = t('defense.defense');
@@ -16,6 +18,9 @@ const DefenseSpace: React.FC = () => {
     const frameDuration = 40; // ~25 fps
     const animationDuration = 2000; // 2s scramble before resolving
     const totalFrames = Math.round(animationDuration / frameDuration);
+
+    // Performance: Store interval refs for proper cleanup
+    const intervalRefs: NodeJS.Timeout[] = [];
 
     const runAnimationOnce = () => {
       let frame = 0;
@@ -41,19 +46,101 @@ const DefenseSpace: React.FC = () => {
         if (frame >= totalFrames) {
           setAnimatedDefenseTitle(original);
           clearInterval(scrambleInterval);
+          // Remove from refs array
+          const index = intervalRefs.indexOf(scrambleInterval);
+          if (index > -1) {
+            intervalRefs.splice(index, 1);
+          }
         }
       }, frameDuration);
+      
+      // Store interval for cleanup
+      intervalRefs.push(scrambleInterval);
     };
 
     // initial run
     runAnimationOnce();
     // repeat every ~5s
     const loop = setInterval(runAnimationOnce, 5000);
+    intervalRefs.push(loop);
 
     return () => {
+      // Performance: Clean up all intervals to prevent memory leak
+      intervalRefs.forEach(interval => clearInterval(interval));
       clearInterval(loop);
     };
   }, [t]);
+
+  // Performance: Setup and cleanup video event listeners properly
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Setup video properties
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.controls = false;
+    video.preload = 'metadata';
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+    video.removeAttribute('controls');
+    video.style.pointerEvents = 'none';
+    video.style.outline = 'none';
+    video.style.position = 'absolute';
+    video.style.top = '50%';
+    video.style.left = '50%';
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.minWidth = '100%';
+    video.style.minHeight = '100%';
+    video.style.objectFit = 'cover';
+    video.style.transform = 'translate(-50%, -50%) translateZ(0)';
+    video.style.willChange = 'transform';
+
+    // Performance: Remove willChange after video loads
+    const removeWillChange = () => {
+      video.style.willChange = 'auto';
+    };
+    video.addEventListener('loadeddata', removeWillChange, { once: true });
+
+    // Ensure video plays and stays playing
+    const ensurePlaying = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    const handleEnded = () => {
+      video.play().catch(() => {});
+    };
+
+    // Try to play immediately
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const tryPlay = () => {
+          video.play().catch(() => {});
+          document.removeEventListener('touchstart', tryPlay);
+          document.removeEventListener('click', tryPlay);
+        };
+        document.addEventListener('touchstart', tryPlay, { once: true });
+        document.addEventListener('click', tryPlay, { once: true });
+      });
+    }
+
+    // Add event listeners
+    video.addEventListener('pause', ensurePlaying);
+    video.addEventListener('ended', handleEnded);
+
+    // Cleanup function
+    return () => {
+      video.removeEventListener('pause', ensurePlaying);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('loadeddata', removeWillChange);
+    };
+  }, []);
+
   // Memoize star positions to prevent recalculation on every render
   const starPositions = useMemo(() => 
     Array.from({ length: 10 }, (_, i) => ({
@@ -157,57 +244,7 @@ const DefenseSpace: React.FC = () => {
             <div className="group relative overflow-hidden flex flex-col min-h-[500px] md:min-h-[720px]" style={{ transform: 'translateZ(0)' }}>
                  {/* Background video fills box */}
                  <video
-                   ref={(video) => {
-                     if (video) {
-                       video.muted = true;
-                       video.loop = true;
-                       video.playsInline = true;
-                       video.controls = false;
-                       video.setAttribute('webkit-playsinline', 'true');
-                       video.setAttribute('playsinline', 'true');
-                       video.removeAttribute('controls');
-                       video.style.pointerEvents = 'none';
-                       video.style.outline = 'none';
-                       // Safari fix for object-cover
-                       video.style.position = 'absolute';
-                       video.style.top = '50%';
-                       video.style.left = '50%';
-                       video.style.width = '100%';
-                       video.style.height = '100%';
-                       video.style.minWidth = '100%';
-                       video.style.minHeight = '100%';
-                       video.style.objectFit = 'cover';
-                       // Performance optimizations
-                       video.style.transform = 'translate(-50%, -50%) translateZ(0)';
-                       video.style.willChange = 'auto';
-                       
-                       // Ensure video plays and stays playing
-                       const ensurePlaying = () => {
-                         if (video.paused) {
-                           video.play().catch(() => {});
-                         }
-                       };
-                       
-                       // Try to play immediately
-                       const playPromise = video.play();
-                       if (playPromise !== undefined) {
-                         playPromise.catch(() => {
-                           // Auto-play was prevented, try again on user interaction
-                           const tryPlay = () => {
-                             video.play().catch(() => {});
-                             document.removeEventListener('touchstart', tryPlay);
-                             document.removeEventListener('click', tryPlay);
-                           };
-                           document.addEventListener('touchstart', tryPlay, { once: true });
-                           document.addEventListener('click', tryPlay, { once: true });
-                         });
-                       }
-                       
-                       // Continuously ensure video is playing
-                       video.addEventListener('pause', ensurePlaying);
-                       video.addEventListener('ended', () => video.play());
-                     }
-                   }}
+                   ref={videoRef}
                    controls={false}
                    className="object-cover opacity-90"
                    src={`${BASE_URL}assets/videos/moon.mp4`}

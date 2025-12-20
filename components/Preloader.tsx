@@ -159,6 +159,11 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
     branchesRef.current = [initialBranch];
 
     const animate = () => {
+      // Performance: Stop animation if preloader is not visible
+      if (!isVisible) {
+        return;
+      }
+      
       frameCountRef.current++;
       
       // Clear with solid black - no transparency to avoid flickering/ghosting
@@ -210,7 +215,10 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         return;
       }
 
-      animationFrameIdRef.current = requestAnimationFrame(animate);
+      // Performance: Only continue animation if still visible
+      if (isVisible) {
+        animationFrameIdRef.current = requestAnimationFrame(animate);
+      }
     };
 
     animate();
@@ -221,7 +229,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onDone, minDuration = 2000 }) => 
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
-  }, [onDone, minDuration, pageReady]);
+  }, [onDone, minDuration, pageReady, isVisible]);
 
   if (!isVisible) return null;
 

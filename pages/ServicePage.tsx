@@ -43,6 +43,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [showPreloader, setShowPreloader] = useState(true);
   const lenisRef = useRef<Lenis | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Helper function to prepend BASE_URL to paths starting with /
   const getAssetPath = (path: string | undefined): string | undefined => {
@@ -69,42 +70,16 @@ const ServicePage: React.FC<ServicePageProps> = ({
     setShowPreloader(true);
   }, [location.pathname]);
 
-  // Set scroll position synchronously before browser paints
+  // Performance: Single scroll reset - let Lenis handle smooth scrolling
+  // Removed duplicate scrollTop reads/writes that cause layout thrashing
   useLayoutEffect(() => {
-    // Set scroll position immediately without any animation or delay
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    
-    // Also reset Lenis if it exists
+    // Only use Lenis for scroll reset to avoid layout thrashing
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
-    }
-    
-    // Disable smooth scrolling temporarily
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    
-    // Force immediate scroll
-    window.scrollTo(0, 0);
-    
-    // Restore original scroll behavior after setting position
-    setTimeout(() => {
-      document.documentElement.style.scrollBehavior = originalScrollBehavior;
-    }, 0);
-  }, [location.pathname]);
-
-  // Reset Lenis scroll position when pathname changes (double check)
-  useEffect(() => {
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true });
-    }
+    } else {
+      // Fallback only if Lenis not initialized
       window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    });
+    }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -171,6 +146,76 @@ const ServicePage: React.FC<ServicePageProps> = ({
     };
   }, []);
 
+  // Performance: Setup and cleanup video event listeners properly
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !heroBackgroundImage?.endsWith('.mp4')) return;
+
+    // Setup video properties
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.controls = false;
+    video.preload = 'metadata';
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+    video.removeAttribute('controls');
+    video.style.pointerEvents = 'none';
+    video.style.outline = 'none';
+    video.style.position = 'absolute';
+    video.style.top = '50%';
+    video.style.left = '50%';
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.minWidth = '100%';
+    video.style.minHeight = '100%';
+    video.style.objectFit = 'cover';
+    video.style.transform = 'translate(-50%, -50%) translateZ(0)';
+    video.style.willChange = 'transform';
+
+    // Performance: Remove willChange after video loads
+    const removeWillChange = () => {
+      video.style.willChange = 'auto';
+    };
+    video.addEventListener('loadeddata', removeWillChange, { once: true });
+
+    // Ensure video plays and stays playing
+    const ensurePlaying = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    const handleEnded = () => {
+      video.play().catch(() => {});
+    };
+
+    // Try to play immediately
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const tryPlay = () => {
+          video.play().catch(() => {});
+          document.removeEventListener('touchstart', tryPlay);
+          document.removeEventListener('click', tryPlay);
+        };
+        document.addEventListener('touchstart', tryPlay, { once: true });
+        document.addEventListener('click', tryPlay, { once: true });
+      });
+    }
+
+    // Add event listeners
+    video.addEventListener('pause', ensurePlaying);
+    video.addEventListener('ended', handleEnded);
+
+    // Cleanup function
+    return () => {
+      video.removeEventListener('pause', ensurePlaying);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('loadeddata', removeWillChange);
+    };
+  }, [heroBackgroundImage]);
+
   const isWhiteBackground = customBackground === 'white';
   const textColorClass = isWhiteBackground ? 'text-black' : 'text-white';
   const selectionClass = isWhiteBackground ? 'selection:bg-nexus-copper selection:text-black' : 'selection:bg-nexus-copper selection:text-white';
@@ -190,60 +235,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
         <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark">
           <div className="absolute inset-0 w-full h-full">
             <video 
-              ref={(video) => {
-                if (video) {
-                  video.muted = true;
-                  video.loop = true;
-                  video.playsInline = true;
-                  video.controls = false;
-                  video.setAttribute('webkit-playsinline', 'true');
-                  video.setAttribute('playsinline', 'true');
-                  video.removeAttribute('controls');
-                  video.style.pointerEvents = 'none';
-                  video.style.outline = 'none';
-                  // Safari fix for object-cover
-                  video.style.position = 'absolute';
-                  video.style.top = '50%';
-                  video.style.left = '50%';
-                  video.style.width = '100%';
-                  video.style.height = '100%';
-                  video.style.minWidth = '100%';
-                  video.style.minHeight = '100%';
-                  video.style.objectFit = 'cover';
-                  // Performance: GPU acceleration for video (composited layer)
-                  video.style.transform = 'translate(-50%, -50%) translateZ(0)';
-                  // Performance: Set willChange for transform, remove after load
-                  video.style.willChange = 'transform';
-                  // Performance: Use metadata preload to avoid full decode on page load
-                  video.preload = 'metadata';
-                  
-                  // Ensure video plays and stays playing
-                  const ensurePlaying = () => {
-                    if (video.paused) {
-                      video.play().catch(() => {});
-                    }
-                  };
-                  
-                  // Try to play immediately
-                  const playPromise = video.play();
-                  if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                      // Auto-play was prevented, try again on user interaction
-                      const tryPlay = () => {
-                        video.play().catch(() => {});
-                        document.removeEventListener('touchstart', tryPlay);
-                        document.removeEventListener('click', tryPlay);
-                      };
-                      document.addEventListener('touchstart', tryPlay, { once: true });
-                      document.addEventListener('click', tryPlay, { once: true });
-                    });
-                  }
-                  
-                  // Continuously ensure video is playing
-                  video.addEventListener('pause', ensurePlaying);
-                  video.addEventListener('ended', () => video.play());
-                }
-              }}
+              ref={videoRef}
               controls={false}
               autoPlay 
               loop 
@@ -269,7 +261,8 @@ const ServicePage: React.FC<ServicePageProps> = ({
               <source src="https://videos.pexels.com/video-files/5427845/5427845-uhd_2560_1440_24fps.mp4" type="video/mp4" />
             </video>
           </div>
-          <div className="absolute inset-0 bg-nexus-dark/45 mix-blend-multiply" />
+          {/* Performance: Removed mix-blend-multiply - expensive GPU operation */}
+          <div className="absolute inset-0 bg-nexus-dark/50" />
           <div 
             className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
             style={{ 

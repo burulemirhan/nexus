@@ -40,10 +40,14 @@ const Navbar: React.FC<NavbarProps> = ({ isMenuOpen, setIsMenuOpen, darkMode = f
           }
 
           // Performance: Batch state updates - only update if changed
+          // Use ref to avoid stale closure issues
           const shouldBeVisible = currentScrollY < lastScrollY.current || currentScrollY <= 50;
-          if (shouldBeVisible !== isVisible) {
-            setIsVisible(shouldBeVisible);
-          }
+          setIsVisible(prevVisible => {
+            if (prevVisible !== shouldBeVisible) {
+              return shouldBeVisible;
+            }
+            return prevVisible;
+          });
           
           lastScrollY.current = currentScrollY;
           ticking = false;

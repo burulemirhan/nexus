@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPreloader, setShowPreloader] = useState(true);
   const location = useLocation();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Update HTML lang attribute based on route
   useEffect(() => {
@@ -75,6 +76,76 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Performance: Setup and cleanup video event listeners properly
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Setup video properties
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.controls = false;
+    video.preload = 'metadata';
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+    video.removeAttribute('controls');
+    video.style.pointerEvents = 'none';
+    video.style.outline = 'none';
+    video.style.position = 'absolute';
+    video.style.top = '50%';
+    video.style.left = '50%';
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.minWidth = '100%';
+    video.style.minHeight = '100%';
+    video.style.objectFit = 'cover';
+    video.style.transform = 'translate(-50%, -50%) translateZ(0)';
+    video.style.willChange = 'transform';
+
+    // Performance: Remove willChange after video loads
+    const removeWillChange = () => {
+      video.style.willChange = 'auto';
+    };
+    video.addEventListener('loadeddata', removeWillChange, { once: true });
+
+    // Ensure video plays and stays playing
+    const ensurePlaying = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    const handleEnded = () => {
+      video.play().catch(() => {});
+    };
+
+    // Try to play immediately
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const tryPlay = () => {
+          video.play().catch(() => {});
+          document.removeEventListener('touchstart', tryPlay);
+          document.removeEventListener('click', tryPlay);
+        };
+        document.addEventListener('touchstart', tryPlay, { once: true });
+        document.addEventListener('click', tryPlay, { once: true });
+      });
+    }
+
+    // Add event listeners
+    video.addEventListener('pause', ensurePlaying);
+    video.addEventListener('ended', handleEnded);
+
+    // Cleanup function
+    return () => {
+      video.removeEventListener('pause', ensurePlaying);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('loadeddata', removeWillChange);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-nexus-copper selection:text-white font-tech text-white">
       {showPreloader && (
@@ -113,14 +184,24 @@ const App: React.FC = () => {
                 video.style.objectFit = 'cover';
                 // Performance: GPU acceleration for video (already composited, this is fine)
                 video.style.transform = 'translate(-50%, -50%) translateZ(0)';
-                // Performance: Remove willChange after video loads
+                
+                // Performance: Remove willChange after video loads to reduce compositing layer overhead
+                const removeWillChange = () => {
+                  video.style.willChange = 'auto';
+                  video.removeEventListener('loadeddata', removeWillChange);
+                };
                 video.style.willChange = 'transform';
+                video.addEventListener('loadeddata', removeWillChange);
                 
                 // Ensure video plays and stays playing
                 const ensurePlaying = () => {
                   if (video.paused) {
                     video.play().catch(() => {});
                   }
+                };
+                
+                const handleEnded = () => {
+                  video.play().catch(() => {});
                 };
                 
                 // Try to play immediately
@@ -138,9 +219,12 @@ const App: React.FC = () => {
                   });
                 }
                 
-                // Continuously ensure video is playing
+                // Performance: Store listeners for cleanup
                 video.addEventListener('pause', ensurePlaying);
-                video.addEventListener('ended', () => video.play());
+                video.addEventListener('ended', handleEnded);
+                
+                // Store video ref for cleanup
+                videoRef.current = video;
               }
             }}
             controls={false}
@@ -148,22 +232,8 @@ const App: React.FC = () => {
             loop 
             muted 
             playsInline
-            preload="metadata"
             className="object-cover -z-50"
             aria-hidden="true"
-            style={{ 
-              pointerEvents: 'none', 
-              outline: 'none',
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: '100%',
-              height: '100%',
-              minWidth: '100%',
-              minHeight: '100%',
-              transform: 'translate(-50%, -50%) translateZ(0)',
-              objectFit: 'cover'
-            }}
           >
             <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
              {/* Fallback stock video of vertical farming/technology */}
@@ -175,9 +245,10 @@ const App: React.FC = () => {
           {/* Performance: mix-blend-mode can be expensive - consider solid overlay if needed */}
           <div className="absolute inset-0 bg-nexus-dark/45" />
         
-        {/* Static Noise Overlay (Optimized) */}
+        {/* Performance: Removed mix-blend-overlay - expensive GPU compositing operation */}
+        {/* Static Noise Overlay (Optimized - blend mode removed) */}
         <div 
-          className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{ 
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
             backgroundRepeat: 'repeat',

@@ -48,10 +48,10 @@ const DataFlowAnimation: React.FC<DataFlowAnimationProps> = ({ className }) => {
 
   return (
     <div className={`relative w-full h-full flex items-center justify-center p-8 ${className || ''}`}>
+      {/* Performance: Removed SVG filter drop-shadow - expensive operation on animated elements */}
       <svg
         viewBox="0 0 100 100"
         className="w-full h-full"
-        style={{ filter: 'drop-shadow(0 0 25px rgba(16, 185, 129, 0.4))' }}
       >
         {/* Background Connections */}
         {nodes.map((node, i) => {
@@ -164,7 +164,7 @@ const DataFlowAnimation: React.FC<DataFlowAnimationProps> = ({ className }) => {
             stroke="#10b981"
             strokeWidth="0.15"
             className="animate-pulse"
-            style={{ animation: 'pulse 2s ease-in-out infinite', filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.6))' }}
+            style={{ animation: 'pulse 2s ease-in-out infinite' }}
           />
           <rect
             x="1.5"
@@ -198,7 +198,7 @@ const DataFlowAnimation: React.FC<DataFlowAnimationProps> = ({ className }) => {
                 r="4"
                 fill={nodeColor}
                 opacity="0.15"
-                className="transition-all duration-700 group-hover:opacity-0.25"
+                className="transition-opacity duration-700 group-hover:opacity-25"
               />
               <circle
                 r="2.5"
@@ -218,7 +218,7 @@ const DataFlowAnimation: React.FC<DataFlowAnimationProps> = ({ className }) => {
                 fontSize="2.2"
                 fill="#ddd"
                 textAnchor="middle"
-                className="font-light tracking-[0.25em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-500"
+                className="font-light tracking-[0.25em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 style={{ fontFamily: 'Barlow' }}
               >
                 {node.label}

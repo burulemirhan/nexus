@@ -73,7 +73,7 @@ const Services: React.FC = () => {
         <div className="mt-10 md:mt-12 flex justify-center">
            <button
              onClick={() => setIsContactOpen(true)}
-             className="px-8 md:px-12 py-3.5 md:py-3.5 bg-transparent text-white border border-white/60 hover:bg-white hover:text-black active:bg-white/90 active:text-black transition-all duration-300 rounded-lg font-display font-bold uppercase tracking-widest touch-manipulation"
+             className="px-8 md:px-12 py-3.5 md:py-3.5 bg-transparent text-white border border-white/60 hover:bg-white hover:text-black active:bg-white/90 active:text-black transition-[background-color,color,border-color] duration-300 rounded-lg font-display font-bold uppercase tracking-widest touch-manipulation"
              style={{ minHeight: '44px', fontSize: '16px' }}
            >
              {t('services.button')}

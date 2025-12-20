@@ -78,7 +78,7 @@ const Technology: React.FC = () => {
             <div className="flex items-center gap-4 md:gap-16 w-full md:w-auto">
                <button 
                  onClick={() => setActiveTab('hardware')}
-                 className={`relative font-tesla font-bold text-base md:text-xl uppercase tracking-normal transition-all duration-300 pb-2 md:pb-4 whitespace-nowrap outline-none touch-manipulation flex-1 md:flex-none ${
+                 className={`relative font-tesla font-bold text-base md:text-xl uppercase tracking-normal transition-[color,opacity] duration-300 pb-2 md:pb-4 whitespace-nowrap outline-none touch-manipulation flex-1 md:flex-none ${
                    activeTab === 'hardware' ? 'text-white' : 'text-white/30 active:text-white/60'
                  }`}
                  style={{ fontFamily: 'Barlow', minHeight: '44px', fontSize: 'clamp(1rem, 2.5vw, 1.5rem)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -93,7 +93,7 @@ const Technology: React.FC = () => {
                </button>
                <button 
                  onClick={() => setActiveTab('ai')}
-                 className={`relative font-tesla font-bold text-base md:text-xl uppercase tracking-normal transition-all duration-300 pb-2 md:pb-4 whitespace-nowrap outline-none touch-manipulation flex-1 md:flex-none ${
+                 className={`relative font-tesla font-bold text-base md:text-xl uppercase tracking-normal transition-[color,opacity] duration-300 pb-2 md:pb-4 whitespace-nowrap outline-none touch-manipulation flex-1 md:flex-none ${
                    activeTab === 'ai' ? 'text-white' : 'text-white/30 active:text-white/60'
                  }`}
                  style={{ fontFamily: 'Barlow', minHeight: '44px', fontSize: 'clamp(1rem, 2.5vw, 1.5rem)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -163,7 +163,7 @@ const Technology: React.FC = () => {
                <div className="hidden md:flex relative w-full items-start justify-center pt-4">
                  {/* Top Left */}
                  <div className="absolute top-4 left-0 w-[40%] max-w-[480px]">
-                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 bg-black/20">
+                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-[border-color] duration-300 bg-black/20">
                      <div className="flex items-center gap-3">
                        <span className="text-white/40 text-base font-mono" style={{ fontFamily: 'Barlow', fontSize: '16px' }}>
                          01
@@ -181,7 +181,7 @@ const Technology: React.FC = () => {
 
                  {/* Top Right */}
                  <div className="absolute top-4 right-0 w-[40%] max-w-[480px]">
-                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 bg-black/20">
+                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-[border-color] duration-300 bg-black/20">
                      <div className="flex items-center gap-3">
                        <span className="text-white/40 text-base font-mono" style={{ fontFamily: 'Barlow', fontSize: '16px' }}>
                          02
@@ -199,7 +199,7 @@ const Technology: React.FC = () => {
 
                  {/* Bottom Left */}
                  <div className="absolute top-[240px] left-0 w-[40%] max-w-[480px]">
-                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 bg-black/20">
+                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-[border-color] duration-300 bg-black/20">
                      <div className="flex items-center gap-3">
                        <span className="text-white/40 text-base font-mono" style={{ fontFamily: 'Barlow', fontSize: '16px' }}>
                          03
@@ -216,7 +216,7 @@ const Technology: React.FC = () => {
 
                  {/* Bottom Right */}
                  <div className="absolute top-[240px] right-0 w-[40%] max-w-[480px]">
-                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 bg-black/20">
+                   <div className="flex flex-col space-y-3 p-5 md:p-6 border border-white/10 hover:border-white/20 transition-[border-color] duration-300 bg-black/20">
                      <div className="flex items-center gap-3">
                        <span className="text-white/40 text-base font-mono" style={{ fontFamily: 'Barlow', fontSize: '16px' }}>
                          04
@@ -259,7 +259,7 @@ const Technology: React.FC = () => {
                      alt={`${tech.name} - ${tech.subtitle}`}
                      loading="lazy"
                      decoding="async"
-                     className="object-cover opacity-90 group-hover:opacity-100 transition-all duration-500"
+                     className="object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500"
                      style={{
                        width: '100%',
                        height: '100%',
