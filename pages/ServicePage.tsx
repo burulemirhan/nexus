@@ -518,8 +518,14 @@ const ServicePage: React.FC<ServicePageProps> = ({
             <div className="space-y-3 text-sm md:text-base font-mono">
               <div>
                 <span className="text-white/40 mr-2">E-mail:</span>
-                <a href="mailto:info@nexusbiotech.org" className="text-white hover:underline">
-                  info@nexusbiotech.org
+                <a href="mailto:emirhanburul@nexusbiotech.org" className="text-white hover:underline">
+                  emirhanburul@nexusbiotech.org
+                </a>
+              </div>
+              <div>
+                <span className="text-white/40 mr-2">Phone:</span>
+                <a href="tel:+905374957304" className="text-white hover:underline">
+                  +90 537 495 73 04
                 </a>
               </div>
             </div>
