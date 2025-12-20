@@ -31,9 +31,6 @@ const AIDataFlow: React.FC = () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    const centerX = canvas.width / (2 * (window.devicePixelRatio || 1));
-    const centerY = canvas.height / (2 * (window.devicePixelRatio || 1));
-
     const farmSymbols: FarmSymbol[] = [
       { id: 'vertical', x: 0.25, y: 0.3, label: 'Vertical' },
       { id: 'greenhouse', x: 0.75, y: 0.3, label: 'Greenhouse' },
@@ -130,6 +127,9 @@ const AIDataFlow: React.FC = () => {
       const height = canvas.height / (window.devicePixelRatio || 1);
       
       ctx.clearRect(0, 0, width, height);
+
+      const centerX = width / 2;
+      const centerY = height / 2;
 
       // Draw "E" letter in center (Tesla font style - bold, condensed)
       ctx.save();
