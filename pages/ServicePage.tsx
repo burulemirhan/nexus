@@ -501,7 +501,7 @@ const ServicePage: React.FC<ServicePageProps> = ({
           onClick={() => setIsContactOpen(false)}
         >
           <div
-            className="relative w-full max-w-sm mx-4 rounded-lg bg-black/90 border border-white/10 px-6 py-6 text-white shadow-2xl"
+            className="relative w-full max-w-md mx-4 rounded-lg bg-black/90 border border-white/10 px-6 py-6 text-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -515,15 +515,15 @@ const ServicePage: React.FC<ServicePageProps> = ({
             <h3 className="font-tesla font-bold text-xl md:text-2xl mb-4 tracking-wide" style={{ fontFamily: 'Barlow' }}>
               {t('services.button')}
             </h3>
-            <div className="space-y-3 font-mono" style={{ fontSize: '0.85rem' }}>
-              <div>
-                <span className="text-white/40 mr-2">E-mail:</span>
-                <a href="mailto:emirhanburul@nexusbiotech.org" className="text-white hover:underline">
+            <div className="space-y-3 text-sm md:text-base font-mono">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <span className="text-white/40 sm:mr-2 flex-shrink-0">E-mail:</span>
+                <a href="mailto:emirhanburul@nexusbiotech.org" className="text-white hover:underline break-all sm:break-normal">
                   emirhanburul@nexusbiotech.org
                 </a>
               </div>
-              <div>
-                <span className="text-white/40 mr-2">Phone:</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <span className="text-white/40 sm:mr-2 flex-shrink-0">Phone:</span>
                 <a href="tel:+905374957304" className="text-white hover:underline">
                   +90 537 495 73 04
                 </a>
