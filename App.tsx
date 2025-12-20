@@ -29,16 +29,16 @@ const App: React.FC = () => {
   useEffect(() => {
     // Initialize Lenis for smooth scrolling with performance optimizations
     const lenis = new Lenis({
-      duration: 0.9, // Faster for mobile responsiveness
+      duration: 0.95, // Balanced speed
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 0.7, // Optimized for smoother scrolling
-      touchMultiplier: 1.8, // Faster touch scrolling for mobile
+      touchMultiplier: 1.5, // Balanced touch scrolling for mobile
       infinite: false,
       syncTouch: true, // Better touch sync
-      syncTouchLerp: 0.1, // Faster touch lerp for responsiveness
+      syncTouchLerp: 0.085, // Balanced touch lerp
     });
 
     let rafId: number;
