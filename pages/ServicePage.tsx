@@ -512,8 +512,8 @@ const ServicePage: React.FC<ServicePageProps> = ({
             <div className="space-y-3 text-sm md:text-base font-mono">
               <div className="flex items-start gap-2">
                 <span className="text-white/40 whitespace-nowrap">E-mail:</span>
-                <a href="mailto:emirhanburul@nexusbiotech.org" className="text-white hover:underline break-all">
-                  emirhanburul@nexusbiotech.org
+                <a href="mailto:info@nexusbiotech.org" className="text-white hover:underline break-all">
+                  info@nexusbiotech.org
                 </a>
               </div>
               <div className="flex items-center gap-2">
