@@ -16,6 +16,18 @@ const Team: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPreloader, setShowPreloader] = useState(true);
   const lenisRef = useRef<Lenis | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Helper function to prepend BASE_URL to paths starting with /
+  const getAssetPath = (path: string | undefined): string | undefined => {
+    if (!path) return path;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    if (BASE_URL === '/') {
+      return path.startsWith('/') ? path : `/${path}`;
+    }
+    if (path.startsWith('/')) return `${BASE_URL}${path.substring(1)}`;
+    return `${BASE_URL}${path}`;
+  };
 
   // Prevent browser scroll restoration
   useEffect(() => {
@@ -29,7 +41,6 @@ const Team: React.FC = () => {
     setShowPreloader(true);
   }, [location.pathname]);
 
-  // Performance: Single scroll reset - let Lenis handle smooth scrolling
   useLayoutEffect(() => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
@@ -95,6 +106,70 @@ const Team: React.FC = () => {
     };
   }, []);
 
+  // Setup video background
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.controls = false;
+    video.preload = 'metadata';
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+    video.removeAttribute('controls');
+    video.style.pointerEvents = 'none';
+    video.style.outline = 'none';
+    video.style.position = 'absolute';
+    video.style.top = '50%';
+    video.style.left = '50%';
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.minWidth = '100%';
+    video.style.minHeight = '100%';
+    video.style.objectFit = 'cover';
+    video.style.transform = 'translate(-50%, -50%) translateZ(0)';
+    video.style.willChange = 'transform';
+
+    const removeWillChange = () => {
+      video.style.willChange = 'auto';
+    };
+    video.addEventListener('loadeddata', removeWillChange, { once: true });
+
+    const ensurePlaying = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    const handleEnded = () => {
+      video.play().catch(() => {});
+    };
+
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const tryPlay = () => {
+          video.play().catch(() => {});
+          document.removeEventListener('touchstart', tryPlay);
+          document.removeEventListener('click', tryPlay);
+        };
+        document.addEventListener('touchstart', tryPlay, { once: true });
+        document.addEventListener('click', tryPlay, { once: true });
+      });
+    }
+
+    video.addEventListener('pause', ensurePlaying);
+    video.addEventListener('ended', handleEnded);
+
+    return () => {
+      video.removeEventListener('pause', ensurePlaying);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('loadeddata', removeWillChange);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-nexus-copper selection:text-white font-tech text-white">
       <SEOHead 
@@ -106,13 +181,14 @@ const Team: React.FC = () => {
       <div className="fixed inset-0 z-0 select-none overflow-hidden bg-nexus-dark">
         <div className="absolute inset-0 w-full h-full">
           <video 
+            ref={videoRef}
             controls={false}
             autoPlay 
             loop 
             muted 
             playsInline
             className="object-cover -z-50"
-            poster={`${BASE_URL}assets/images/bg.avif`}
+            poster={getAssetPath(`${BASE_URL}assets/images/bg.avif`)}
             style={{ 
               pointerEvents: 'none', 
               outline: 'none',
@@ -127,7 +203,7 @@ const Team: React.FC = () => {
               objectFit: 'cover'
             }}
           >
-            <source src={`${BASE_URL}assets/videos/bg.mp4`} type="video/mp4" />
+            <source src={getAssetPath(`${BASE_URL}assets/videos/bg.mp4`)} type="video/mp4" />
             <source src="https://videos.pexels.com/video-files/5427845/5427845-uhd_2560_1440_24fps.mp4" type="video/mp4" />
           </video>
         </div>
@@ -153,12 +229,12 @@ const Team: React.FC = () => {
       <main className="flex-grow z-10 flex flex-col">
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-          <div className="w-full px-4 md:px-12 relative z-10 flex flex-col items-center justify-center min-h-full">
+          <div className="w-full px-4 md:px-12 relative z-10 flex flex-col items-center justify-center min-h-full py-12 md:py-16">
             <div className="max-w-4xl mx-auto w-full text-center px-2 md:px-0">
-              <h1 className="font-tesla font-bold text-3xl md:text-6xl text-white uppercase tracking-wide md:tracking-wider drop-shadow-2xl leading-[1.1] md:leading-[0.9] break-words hyphens-auto mb-6" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.875rem, 4vw, 3.75rem)', maxWidth: '100%', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+              <h1 className="font-tesla font-bold text-3xl md:text-6xl text-white uppercase tracking-wide md:tracking-wider drop-shadow-2xl leading-[1.1] md:leading-[0.9] break-words hyphens-auto mb-6 md:mb-8" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.875rem, 4vw, 3.75rem)', maxWidth: '100%', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
                 {t('team.title')}
               </h1>
-              <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto">
+              <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-12 md:mb-16" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
                 {t('team.subtitle')}
               </p>
             </div>
@@ -166,19 +242,19 @@ const Team: React.FC = () => {
         </section>
 
         {/* Team Member Section */}
-        <section className="relative py-16 md:py-32 bg-nexus-dark/50 backdrop-blur-sm">
+        <section className="relative py-16 md:py-24 bg-nexus-dark/50 backdrop-blur-sm">
           <div className="w-full px-4 md:px-12 relative z-10">
             <div className="max-w-4xl mx-auto w-full">
               <div className="bg-black/40 border border-white/10 p-8 md:p-12 rounded-lg backdrop-blur-sm">
-                <h2 className="font-tesla font-bold text-2xl md:text-4xl text-white uppercase mb-6 tracking-wide" style={{ fontFamily: 'Barlow' }}>
-                  {t('team.emirhan.name')}
+                <h2 className="font-tesla font-bold text-2xl md:text-4xl text-white uppercase mb-6 md:mb-8 tracking-wide" style={{ fontFamily: 'Barlow', fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
+                  {t('team.member.name')}
                 </h2>
-                <div className="space-y-4 text-white/80 text-base md:text-lg font-light leading-relaxed">
-                  <p>
-                    {t('team.emirhan.description1')}
+                <div className="space-y-4 md:space-y-6">
+                  <p className="text-white/90 text-base md:text-lg font-light leading-relaxed" style={{ fontSize: 'clamp(1rem, 2vw, 1.125rem)' }}>
+                    {t('team.member.description')}
                   </p>
-                  <p>
-                    {t('team.emirhan.description2')}
+                  <p className="text-white/90 text-base md:text-lg font-light leading-relaxed" style={{ fontSize: 'clamp(1rem, 2vw, 1.125rem)' }}>
+                    {t('team.member.description2')}
                   </p>
                 </div>
               </div>

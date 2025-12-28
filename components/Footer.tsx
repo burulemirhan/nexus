@@ -15,18 +15,18 @@ const Footer: React.FC = () => {
       aria-label="Site footer"
     >
       <div className="w-full px-4 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 py-4">
-        <nav className="flex flex-wrap gap-6 text-sm md:text-sm text-white/60 font-display uppercase tracking-widest justify-center md:justify-start" aria-label="Footer navigation" style={{ fontSize: '16px' }}>
-          <button
-            onClick={() => {
-              const basePath = location.pathname.startsWith('/en') ? '/en/team' : '/ekip';
-              navigate(basePath);
-              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        <nav className="flex gap-6 text-sm md:text-sm text-white/60 font-display uppercase tracking-widest" aria-label="Footer navigation links" style={{ fontSize: '16px' }}>
+          <a 
+            href={location.pathname.startsWith('/en') ? '/en/team' : '/ekip'}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(location.pathname.startsWith('/en') ? '/en/team' : '/ekip');
             }}
             className="hover:text-white active:text-white transition-colors touch-manipulation"
             style={{ minHeight: '44px', display: 'flex', alignItems: 'center' }}
           >
             {t('nav.team')}
-          </button>
+          </a>
           <a 
             href="#" 
             className="hover:text-white active:text-white transition-colors touch-manipulation"
